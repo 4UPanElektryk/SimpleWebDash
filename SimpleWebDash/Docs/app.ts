@@ -139,7 +139,7 @@ function CheckTemperatureEndpointAndSet(id: string) {
 }
 async function GetTempsOfServer(host: string): Promise<ServerDataResponse<TemperatureEndpointResponseData>> {
 	try {
-		const response = await fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(500) });
+		const response = await fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(1000) });
 		const times = await response.json() as ServerDataResponse<TemperatureEndpointResponseData>;
 		return times;
 	}

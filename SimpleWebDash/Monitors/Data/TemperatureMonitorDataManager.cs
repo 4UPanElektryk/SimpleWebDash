@@ -5,7 +5,7 @@ namespace SimpleWebDash.Monitors.Data
 {
 	public class TemperatureMonitorDataManager : SaveObjManager<TemperatureMonitorData>
 	{
-		internal const int MAX_ALLOWED_DATA_IN_RESPONSE = 100;
+		internal const int MAX_ALLOWED_DATA_IN_RESPONSE = 1000;
 		public static void Add(TemperatureMonitorData idata)
 		{
 			data.Add(idata);
@@ -20,6 +20,7 @@ namespace SimpleWebDash.Monitors.Data
 			//Console.WriteLine(allinagiventimespan.Count);
 			List<TemperatureMonitorData> Final = new List<TemperatureMonitorData>();
 			int evrynth = allinagiventimespan.Count / MAX_ALLOWED_DATA_IN_RESPONSE;
+			if (evrynth < 1) { evrynth = 1; }
 			for (int i = 0; i < allinagiventimespan.Count; i += evrynth)
 			{
 				Final.Add(allinagiventimespan[i]);

@@ -132,7 +132,7 @@ function CheckTemperatureEndpointAndSet(id) {
 function GetTempsOfServer(host) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const response = yield fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(500) });
+            const response = yield fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(1000) });
             const times = yield response.json();
             return times;
         }
