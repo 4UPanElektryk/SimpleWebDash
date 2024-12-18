@@ -1,0 +1,66 @@
+$okColor: #108600;
+$warningColor: #FF9900;
+$errorColor: #860010;
+
+body{
+    margin: 0px;
+    background-color: #010104;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sensor-graph, .sensor-group{
+    height: 326px;
+    width: 30%;
+    margin-top: 45px;
+    text-align: center;
+    @media only screen and (max-width: 600px){
+        width: 90%;
+    }
+    @media only screen and (min-width: 600px) and (max-width: 900px){
+        width: 45%;
+
+    }
+    span.big{
+        font-size: 2em;
+    }
+    span.small{
+        font-size: 0.75em;
+        margin-left: 10px;
+    }
+}
+
+.s-ok{
+    background-color: rgba($color: $okColor, $alpha: 0.6);
+    border: $okColor solid 2px;
+    border-radius: 5px;
+}
+.s-warning{
+    background-color: rgba($color: $warningColor, $alpha: 0.6);
+    border: $warningColor solid 2px;
+    border-radius: 5px;
+}
+.s-error{
+    background-color: rgba($color: $errorColor, $alpha: 0.6);
+    border: $errorColor solid 2px;
+    border-radius: 5px;
+}
+
+.sensor-group{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.sensor-single{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+}
+
+.sensors-set{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: flex-start;
+}

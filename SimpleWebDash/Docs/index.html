@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style.css">
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<title>Document</title>
+</head>
+<body>
+	<select name="" id="period">
+		<option value="0000d00h01m">1 minute</option>
+		<option value="0000d00h05m">5 minute</option>
+		<option value="0000d00h30m">30 minute</option>
+		<option value="0000d01h00m">1 hour</option>
+		<option value="0000d06h00m">6 hours</option>
+		<option value="0000d12h00m">12 hours</option>
+		<option value="0001d00h00m">1 day</option>
+		<option value="0007d00h00m">1 Week</option>
+		<option value="0028d00h00m">1 Month</option>
+		<option value="0365d00h00m">1 Year</option>
+	</select>
+	<div class="sensors-set">
+		<div class="sensor-graph" id="Temperature">
+			<span class="big"><i class="fa" aria-hidden="true" id="Temperature-icon"></i>Server Temperature</span>
+			<span class="small" id="Temperature-msg"></span>
+			<div class="chart" id="Temperature-chart"></div>
+			
+		</div>
+		<div class="sensor-group">
+			<div class="sensor-single" id="PiHole">
+				<span class="big"><i class="fa" aria-hidden="true" id="PiHole-icon"></i>PiHole</span>
+				<span class="small" id="PiHole-msg"></span>
+			</div>
+			<div class="sensor-single" id="Printer">
+				<span class="big"><i class="fa" aria-hidden="true" id="Printer-icon"></i>Printer</span>
+				<span class="small" id="Printer-msg"></span>
+			</div>
+			<div class="sensor-single" id="VPN">
+				<span class="big"><i class="fa" aria-hidden="true" id="VPN-icon"></i>VPN</span>
+				<span class="small" id="VPN-msg"></span>
+			</div>
+		</div>
+		<div class="sensor-group">
+			<div class="sensor-single" id="TrueNas">
+				<span class="big"><i class="fa" aria-hidden="true" id="TrueNas-icon"></i>TrueNas</span>
+				<span class="small" id="TrueNas-msg"></span>
+			</div>
+			<div class="sensor-single" id="NextCloud">
+				<span class="big"><i class="fa" aria-hidden="true" id="NextCloud-icon"></i>NextCloud</span>
+				<span class="small" id="NextCloud-msg"></span>
+			</div>
+			<div class="sensor-single" id="NVR">
+				<span class="big"><i class="fa" aria-hidden="true" id="NVR-icon"></i>NVR</span>
+				<span class="small" id="NVR-msg"></span>
+			</div>
+		</div>
+		<div class="sensor-graph">
+			
+		</div>
+	</div>
+	<script src="app.js"></script>
+</body>
+</html>
