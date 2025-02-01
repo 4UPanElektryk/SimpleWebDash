@@ -18,53 +18,21 @@ namespace SimpleWebDash.Endpoints
 			int minutes = int.Parse(tspan.Split('d')[1].Split('h')[1].TrimEnd('m'));
 			TimeSpan span = new TimeSpan(days, hours, minutes, 0);
 			DateTime start = DateTime.UtcNow - span;
-			IpMonitorData[] datas = IpMonitorDataManager.GetAllFrom(start, request.URLParamenters["ip"]);
-			bool slowResponses = false;
-			int lostPackets = 0;
-			long average = 0;
-			long Min = 1000000;
-			long Max = 0;
-			int successCount = 0;
-			foreach (IpMonitorData data in datas)
-			{
-				if (!data.Success)
-				{
-					lostPackets++;
-					continue;
-				}
-                if (data.ResponseTime > Max)
-                {
-					Max = data.ResponseTime;
-                }
-				if (data.ResponseTime < Min) {
-					Min = data.ResponseTime;
-				}
-
-                average += data.ResponseTime;
-				successCount++;
-				if (data.ResponseTime > slowNetResponseTime)
-				{
-					slowResponses = true;
-				}
-			}
-			if (successCount > 0)
-			{
-				average /= successCount;
-			}
+			IpEndpointResponseData responseData = IpMonitorDataManager.GetResponseData(start, request.URLParamenters["ip"]);
 			string message = "OK";
 			DataResponseType responseType = DataResponseType.Success;
-			if (slowResponses)
+			if (responseData.Avg > slowNetResponseTime)
 			{
 				message = "Slow Response";
 				responseType = DataResponseType.Warning;
 			}
 			else
 			{
-				if (lostPackets > span.TotalMinutes / 10)
+				if (responseData.Timeouts > (responseData.Total / 1000))
 				{
 					message = "Lost Packets";
 					responseType = DataResponseType.Warning;
-					if (!datas[datas.Length - 1].Success)
+					if (responseData.Timeouts > (responseData.Total / 2))
 					{
 						message = "Currenty Expiriencing Colosal Packet Loss!\nThe System May Be Down";
 						responseType = DataResponseType.Error;
@@ -75,14 +43,7 @@ namespace SimpleWebDash.Endpoints
 			{
 				Type = responseType,
 				Message = message,
-				Data = new IpEndpointResponseData()
-				{
-					Avg = average,
-					Max = Max,
-					Min = Min,
-					Timeouts = lostPackets,
-					Total = datas.Length
-				}
+				Data = responseData
 			};
 			HttpResponse response = new HttpResponse(StatusCode.OK, null, JsonConvert.SerializeObject(response1), ContentType.application_json);
 			response.Headers.Add("Access-Control-Allow-Origin", "*");

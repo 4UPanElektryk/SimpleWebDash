@@ -9,6 +9,7 @@ namespace SimpleWebDash.Monitors.Data
 	{
 		public static void Add(HttpMonitorData idata)
 		{
+			MySqlConnection conn = NConnection;
 			conn.Open();
 			MySqlCommand cmd = new MySqlCommand("INSERT INTO httpmonitordata (Address, Time, Success, ResponseTime) VALUES (@Address, @Time, @Success, @ResponseTime)", conn);
 			cmd.Parameters.AddWithValue("@Address", idata.ID);
@@ -20,6 +21,7 @@ namespace SimpleWebDash.Monitors.Data
 		}
 		public static IpEndpointResponseData GetResponseData(DateTime date, string IP)
 		{
+			MySqlConnection conn = NConnection;
 			conn.Open();
 			// IpEndpointResponseData
 			// Avg, Max, Min, Timeouts, Total
@@ -54,8 +56,10 @@ namespace SimpleWebDash.Monitors.Data
 				Total = total
 			};
 		}
+		// Depricated/ Nolonger used
 		public static HttpMonitorData[] GetAllFrom(DateTime date, string ID)
 		{
+			MySqlConnection conn = NConnection;
 			conn.Open();
 			MySqlCommand cmd = new MySqlCommand("SELECT * FROM httpmonitordata WHERE Time > @Time AND Address = @Address", conn);
 			cmd.Parameters.AddWithValue("@Time", date);
@@ -74,10 +78,6 @@ namespace SimpleWebDash.Monitors.Data
 			}
 			conn.Close();
 			return data.ToArray();
-		}
-		public static MySqlConnection GetConnection()
-		{
-			return conn;
 		}
 	}
 }

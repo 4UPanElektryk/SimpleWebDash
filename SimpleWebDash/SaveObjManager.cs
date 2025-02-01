@@ -8,10 +8,11 @@ namespace SimpleWebDash
 {
 	public class SaveObjManager<T>
 	{
-		protected static MySqlConnection conn;
+		protected static string connstring = "";
+		protected static MySqlConnection NConnection { get { return new MySqlConnection(connstring); } }
 		public static void Initialize(string server, string username, string password)
 		{
-			conn = new MySqlConnection($"Server={server};Database=gathereddata;User={username};Password={password};");
+			connstring = $"Server={server};Database=gathereddata;User={username};Password={password};";
 		}
 	}
 }
