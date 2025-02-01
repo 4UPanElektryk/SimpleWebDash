@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using CoolConsole;
+using CoolConsole.MenuItems;
 using NetBase;
 using NetBase.Communication;
 using NetBase.FileProvider;
@@ -15,6 +17,18 @@ namespace SimpleWebDash
 		private static List<DataEndpoint> endpoints;
 		static void Main(string[] args)
 		{
+			ReturnCode code = Menu.Show(new List<MenuItem>
+			{
+				new TextboxMenuItem("SQL Server Address", "localhost"),
+				new TextboxMenuItem("SQL Server User", "root"),
+				new TextboxMenuItem("SQL Server Password", ""),
+				new CheckboxMenuItem("ReadOnlyNode", false),
+				new MenuItem("Continue")
+			});
+			string sqlServerAddress = code.Textboxes[0];
+			string sqlServerUser = code.Textboxes[1];
+			string sqlServerPassword = code.Textboxes[2];
+			bool IsReadOnlyNode = code.Checkboxes[0];
 			Server.router = DataRecieved;
 			Monitor[] monitors = {
 				new IpMonitor("192.168.10.149"),
@@ -37,10 +51,10 @@ namespace SimpleWebDash
 			Router.Add(loader, "index.html", "");
 			Router.Add(loader, "index.html");
 			Router.Add(loader, "style.css");
-			IpMonitorDataManager.Initialize("IpData.json");
-			HttpMonitorDataManager.Initialize("HttpData.json");
-			TemperatureMonitorDataManager.Initialize("TempsData.json");
-			Clock.Start();
+			IpMonitorDataManager.Initialize(sqlServerAddress,sqlServerUser,sqlServerPassword);
+			HttpMonitorDataManager.Initialize(sqlServerAddress, sqlServerUser, sqlServerPassword);
+			TemperatureMonitorDataManager.Initialize(sqlServerAddress, sqlServerUser, sqlServerPassword);
+			if (!IsReadOnlyNode) { Clock.Start(); }
 			Server.Start(IPAddress.Loopback, 8080);
 			while (true) { }
 		}

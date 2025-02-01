@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MySqlConnector;
 
 namespace SimpleWebDash.Monitors.Data
 {
@@ -7,17 +8,35 @@ namespace SimpleWebDash.Monitors.Data
 	{
 		public static void Add(HttpMonitorData idata)
 		{
-			data.Add(idata);
-			Save();
+			conn.Open();
+			MySqlCommand cmd = new MySqlCommand("INSERT INTO httpmonitordata (Address, Time, Success, ResponseTime) VALUES (@Address, @Time, @Success, @ResponseTime)", conn);
+			cmd.Parameters.AddWithValue("@Address", idata.ID);
+			cmd.Parameters.AddWithValue("@Time", idata.Time);
+			cmd.Parameters.AddWithValue("@Success", idata.Success);
+			cmd.Parameters.AddWithValue("@ResponseTime", idata.ResponseTime);
+			cmd.ExecuteNonQuery();
+			conn.Close();
 		}
 		public static HttpMonitorData[] GetAllFrom(DateTime date, string ID)
 		{
-			//Console.WriteLine(data.Count);
-			List<HttpMonitorData> allforip = data.FindAll((x) => x.ID == ID);
-			//Console.WriteLine(allforip.Count);
-			List<HttpMonitorData> allinagiventimespan = allforip.FindAll((x) => x.Time > date);
-			//Console.WriteLine(allinagiventimespan.Count);
-			return allinagiventimespan.ToArray();
+			MySqlCommand cmd = new MySqlCommand("SELECT * FROM httpmonitordata WHERE Time > @Time AND Address = @Address", conn);
+			cmd.Parameters.AddWithValue("@Time", date);
+			cmd.Parameters.AddWithValue("@Address", ID);
+			conn.Open();
+			MySqlDataReader reader = cmd.ExecuteReader();
+			
+			List<HttpMonitorData> data = new List<HttpMonitorData>();
+			while (reader.Read())
+			{
+				HttpMonitorData temp = new HttpMonitorData();
+				temp.ID = reader.GetString("Address");
+				temp.Time = reader.GetDateTime("Time");
+				temp.Success = reader.GetBoolean("Success");
+				temp.ResponseTime = reader.GetInt64("ResponseTime");
+				data.Add(temp);
+			}
+			conn.Close();
+			return data.ToArray();
 		}
 	}
 }
