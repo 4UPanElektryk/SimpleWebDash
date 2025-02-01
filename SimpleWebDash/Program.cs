@@ -22,7 +22,7 @@ namespace SimpleWebDash
 				new TextboxMenuItem("SQL Server Address", "localhost"),
 				new TextboxMenuItem("SQL Server User", "root"),
 				new TextboxMenuItem("SQL Server Password", ""),
-				new CheckboxMenuItem("ReadOnlyNode", false),
+				new CheckboxMenuItem("ReadOnlyNode", true),
 				new MenuItem("Continue")
 			});
 			string sqlServerAddress = code.Textboxes[0];

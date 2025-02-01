@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MySqlConnector;
+using SimpleWebDash.Endpoints;
 
 namespace SimpleWebDash.Monitors.Data
 {
@@ -17,12 +18,48 @@ namespace SimpleWebDash.Monitors.Data
 			cmd.ExecuteNonQuery();
 			conn.Close();
 		}
+		public static IpEndpointResponseData GetResponseData(DateTime date, string IP)
+		{
+			conn.Open();
+			// IpEndpointResponseData
+			// Avg, Max, Min, Timeouts, Total
+			// SELECT * FROM httpmonitordata WHERE Time > @Time AND Address = @Address
+			MySqlCommand cmd = new MySqlCommand("SELECT AVG(ResponseTime) as Avg, MAX(ResponseTime) as Max, MIN(ResponseTime) as Min, COUNT(ID) as Total FROM httpmonitordata WHERE Time > @Time AND Address = @Address", conn);
+
+			cmd.Parameters.AddWithValue("@Time", date);
+			cmd.Parameters.AddWithValue("@Address", IP);
+			MySqlDataReader reader = cmd.ExecuteReader();
+			reader.Read();
+			long avg = reader.GetInt64("Avg");
+			long max = reader.GetInt64("Max");
+			long min = reader.GetInt64("Min");
+			int total = reader.GetInt32("Total");
+			reader.Close();
+
+			cmd = new MySqlCommand("SELECT COUNT(ID) as Timeouts FROM httpmonitordata WHERE Time > @Time AND Address = @Address AND Success = 0", conn);
+			cmd.Parameters.AddWithValue("@Time", date);
+			cmd.Parameters.AddWithValue("@Address", IP);
+			reader = cmd.ExecuteReader();
+			reader.Read();
+			int timeouts = reader.GetInt32("Timeouts");
+			reader.Close();
+			conn.Close();
+
+			return new IpEndpointResponseData
+			{
+				Avg = avg,
+				Max = max,
+				Min = min,
+				Timeouts = timeouts,
+				Total = total
+			};
+		}
 		public static HttpMonitorData[] GetAllFrom(DateTime date, string ID)
 		{
+			conn.Open();
 			MySqlCommand cmd = new MySqlCommand("SELECT * FROM httpmonitordata WHERE Time > @Time AND Address = @Address", conn);
 			cmd.Parameters.AddWithValue("@Time", date);
 			cmd.Parameters.AddWithValue("@Address", ID);
-			conn.Open();
 			MySqlDataReader reader = cmd.ExecuteReader();
 			
 			List<HttpMonitorData> data = new List<HttpMonitorData>();
@@ -37,6 +74,10 @@ namespace SimpleWebDash.Monitors.Data
 			}
 			conn.Close();
 			return data.ToArray();
+		}
+		public static MySqlConnection GetConnection()
+		{
+			return conn;
 		}
 	}
 }

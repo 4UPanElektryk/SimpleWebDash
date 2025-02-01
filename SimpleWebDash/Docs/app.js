@@ -22,6 +22,8 @@ timespan.addEventListener("change", () => {
 google.charts.load('current', { packages: ['corechart'] });
 google.charts.setOnLoadCallback(SetupAfterGoogleChartsLoad);
 var Temps;
+let SubscribedHTTP = [];
+let SubscribedIP = [];
 function SensorSimpleSet(obj, type, msg) {
     let icon = document.getElementById(`${obj}-icon`);
     let text = document.getElementById(`${obj}-msg`);
@@ -91,48 +93,63 @@ function CheckTemperatureEndpointAndSet(id) {
     if (LoadingDict.includes(id)) {
         delete LoadingDict[LoadingDict.indexOf(id)];
     }
-    let Hydrogen = GetTempsOfServer("192.168.10.10");
-    let Helium = GetTempsOfServer("192.168.10.11");
-    let Lithium = GetTempsOfServer("192.168.10.12");
-    Promise.all([Hydrogen, Helium, Lithium]).then((values) => {
-        if (values[0].Type == DataResponseType.Error && values[1].Type == DataResponseType.Error && values[2].Type == DataResponseType.Error) {
+    GetTempsOfServer("192.168.10.10").then((Hydrogen) => {
+        if (Hydrogen.Type == DataResponseType.Error) {
             if (!LoadingDict.includes(id)) {
                 LoadingDict.push(id);
             }
         }
         else {
-            Temps = new google.visualization.DataTable();
-            Temps.addColumn('datetime', 'Time');
-            Temps.addColumn('number', 'Hydrogen °C');
-            Temps.addColumn('number', 'Helium °C');
-            Temps.addColumn('number', 'Lithium °C');
-            //console.log(values);
-            let dominant = 0;
-            for (let i = 0; i < values.length; i++) {
-                if (values[i].Data.Times.length == Math.max(values[0].Data.Times.length, values[1].Data.Times.length, values[2].Data.Times.length)) {
-                    dominant = i;
+            GetTempsOfServer("192.168.10.11").then((Helium) => {
+                if (Helium.Type == DataResponseType.Error) {
+                    if (!LoadingDict.includes(id)) {
+                        LoadingDict.push(id);
+                    }
                 }
-            }
-            for (let i = 0; i < values[dominant].Data.Times.length; i++) {
-                Temps.addRows([
-                    [
-                        new Date(values[dominant].Data.Times[i] * 1000),
-                        values[0].Data.Temps[i],
-                        values[1].Data.Temps[i],
-                        values[2].Data.Temps[i]
-                    ]
-                ]);
-            }
-            drawChart();
-            SensorSimpleSet(id, DataResponseType.Success, "");
-            //console.log(`Temps: ${values[0].Data.Temps.values[0]} ${values[1].Data.Temps.values[0]} ${values[2].Data.Temps.values[0]}`)
+                else {
+                    GetTempsOfServer("192.168.10.12").then((Lithium) => {
+                        if (Lithium.Type == DataResponseType.Error) {
+                            if (!LoadingDict.includes(id)) {
+                                LoadingDict.push(id);
+                            }
+                        }
+                        else {
+                            Temps = new google.visualization.DataTable();
+                            Temps.addColumn('datetime', 'Time');
+                            Temps.addColumn('number', 'Hydrogen °C');
+                            Temps.addColumn('number', 'Helium °C');
+                            Temps.addColumn('number', 'Lithium °C');
+                            let values = [Hydrogen, Helium, Lithium];
+                            let dominant = 0;
+                            for (let i = 0; i < values.length; i++) {
+                                if (values[i].Data.Times.length == Math.max(values[0].Data.Times.length, values[1].Data.Times.length, values[2].Data.Times.length)) {
+                                    dominant = i;
+                                }
+                            }
+                            for (let i = 0; i < values[dominant].Data.Times.length; i++) {
+                                Temps.addRows([
+                                    [
+                                        new Date(values[dominant].Data.Times[i] * 1000),
+                                        values[0].Data.Temps[i],
+                                        values[1].Data.Temps[i],
+                                        values[2].Data.Temps[i]
+                                    ]
+                                ]);
+                            }
+                            drawChart();
+                            SensorSimpleSet(id, DataResponseType.Success, "");
+                            //console.log(`Temps: ${values[0].Data.Temps.values[0]} ${values[1].Data.Temps.values[0]} ${values[2].Data.Temps.values[0]}`)
+                        }
+                    });
+                }
+            });
         }
     });
 }
 function GetTempsOfServer(host) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const response = yield fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(1000) });
+            const response = yield fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(1500) });
             const times = yield response.json();
             return times;
         }
@@ -149,24 +166,11 @@ function GetTempsOfServer(host) {
 }
 function SubscribeIpEndpoint(ip, obj) {
     LoadingDict.push(obj);
-    CheckIpEndpointAndSet(ip, obj);
-    setInterval(() => {
-        CheckIpEndpointAndSet(ip, obj);
-    }, 10000);
-}
-function SubscribeTemperatureEndpoint(obj) {
-    LoadingDict.push(obj);
-    CheckTemperatureEndpointAndSet(obj);
-    setInterval(() => {
-        CheckTemperatureEndpointAndSet(obj);
-    }, 10000);
+    SubscribedIP.push({ obj: obj, data: ip });
 }
 function SubscribeHttpEndpoint(id, obj) {
     LoadingDict.push(obj);
-    CheckHttpEndpointAndSet(id, obj);
-    setInterval(() => {
-        CheckHttpEndpointAndSet(id, obj);
-    }, 10000);
+    SubscribedHTTP.push({ obj: obj, data: id });
 }
 SubscribeIpEndpoint("hole.lan", "PiHole");
 SubscribeIpEndpoint("192.168.10.251", "Printer");
@@ -180,7 +184,6 @@ function SetupAfterGoogleChartsLoad() {
     Temps.addColumn('number', 'Hydrogen °C');
     Temps.addColumn('number', 'Helium °C');
     Temps.addColumn('number', 'Lithium °C');
-    SubscribeTemperatureEndpoint("Temperature");
 }
 function drawChart() {
     let t = +timespan.value.substring(0, 4) * 86400000 + +timespan.value.substring(5, 7) * 3600000 + +timespan.value.substring(8, 10) * 60000;
@@ -240,3 +243,14 @@ setInterval(() => {
     cycle++;
     cycle = cycle % 3;
 }, 500);
+setInterval(() => {
+    SubscribedIP.forEach(element => {
+        CheckIpEndpointAndSet(element.data, element.obj);
+    });
+    SubscribedHTTP.forEach(element => {
+        CheckHttpEndpointAndSet(element.data, element.obj);
+    });
+    if (Temps != null) {
+        CheckTemperatureEndpointAndSet("Temperature");
+    }
+}, 10000);
