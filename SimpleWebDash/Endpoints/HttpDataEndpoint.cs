@@ -1,5 +1,4 @@
-﻿using MySqlConnector;
-using NetBase.Communication;
+﻿using NetBase.Communication;
 using Newtonsoft.Json;
 using SimpleWebDash.Monitors.Data;
 using System;

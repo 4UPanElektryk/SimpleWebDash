@@ -19,15 +19,15 @@ namespace SimpleWebDash
 		{
 			ReturnCode code = Menu.Show(new List<MenuItem>
 			{
-				new TextboxMenuItem("SQL Server Address", "localhost"),
-				new TextboxMenuItem("SQL Server User", "root"),
-				new TextboxMenuItem("SQL Server Password", ""),
+				new TextboxMenuItem("IP Monitor Data Path", "ips.c.json"),
+				new TextboxMenuItem("HTTP Monitor Data Path", "https.c.json"),
+				new TextboxMenuItem("TEMPS Monitor Data Path", "temps.c.json"),
 				new CheckboxMenuItem("ReadOnlyNode", true),
 				new MenuItem("Continue")
 			});
-			string sqlServerAddress = code.Textboxes[0];
-			string sqlServerUser = code.Textboxes[1];
-			string sqlServerPassword = code.Textboxes[2];
+			string IPPath = code.Textboxes[0];
+			string HTTPPath = code.Textboxes[1];
+			string TEMPSPath = code.Textboxes[2];
 			bool IsReadOnlyNode = code.Checkboxes[0];
 			Server.router = DataRecieved;
 			Monitor[] monitors = {
@@ -51,9 +51,9 @@ namespace SimpleWebDash
 			Router.Add(loader, "index.html", "");
 			Router.Add(loader, "index.html");
 			Router.Add(loader, "style.css");
-			IpMonitorDataManager.Initialize(sqlServerAddress,sqlServerUser,sqlServerPassword);
-			HttpMonitorDataManager.Initialize(sqlServerAddress, sqlServerUser, sqlServerPassword);
-			TemperatureMonitorDataManager.Initialize(sqlServerAddress, sqlServerUser, sqlServerPassword);
+			IpMonitorDataManager.Initialize(IPPath);
+			HttpMonitorDataManager.Initialize(HTTPPath);
+			TemperatureMonitorDataManager.Initialize(TEMPSPath);
 			if (!IsReadOnlyNode) { Clock.Start(); }
 			Server.Start(IPAddress.Loopback, 8080);
 			while (true) { }
@@ -74,7 +74,6 @@ namespace SimpleWebDash
 					return item.ReturnData(request);
 				}
 			}
-
 			return new HttpResponse(StatusCode.Not_Found);
 		}
 	}
