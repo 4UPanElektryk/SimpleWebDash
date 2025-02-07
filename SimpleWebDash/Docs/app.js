@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var DataResponseType;
 (function (DataResponseType) {
     DataResponseType[DataResponseType["Success"] = 0] = "Success";
@@ -26,22 +17,22 @@ function SensorSimpleSet(obj, type, msg) {
     let icon = document.getElementById(`${obj}-icon`);
     let text = document.getElementById(`${obj}-msg`);
     let objj = document.getElementById(obj);
-    icon === null || icon === void 0 ? void 0 : icon.classList.remove("fa-check", "fa-exclamation-triangle", "fa-times", "fa-refresh", "fa-spin");
-    objj === null || objj === void 0 ? void 0 : objj.classList.remove("s-ok", "s-warning", "s-error");
+    icon?.classList.remove("fa-check", "fa-exclamation-triangle", "fa-times", "fa-refresh", "fa-spin");
+    objj?.classList.remove("s-ok", "s-warning", "s-error");
     if (type == DataResponseType.Success) {
-        icon === null || icon === void 0 ? void 0 : icon.classList.add("fa-check");
-        objj === null || objj === void 0 ? void 0 : objj.classList.add("s-ok");
+        icon?.classList.add("fa-check");
+        objj?.classList.add("s-ok");
     }
     else if (type == DataResponseType.Warning) {
-        icon === null || icon === void 0 ? void 0 : icon.classList.add("fa-exclamation-triangle");
-        objj === null || objj === void 0 ? void 0 : objj.classList.add("s-warning");
+        icon?.classList.add("fa-exclamation-triangle");
+        objj?.classList.add("s-warning");
     }
     else if (type == DataResponseType.Error) {
-        icon === null || icon === void 0 ? void 0 : icon.classList.add("fa-times");
-        objj === null || objj === void 0 ? void 0 : objj.classList.add("s-error");
+        icon?.classList.add("fa-times");
+        objj?.classList.add("s-error");
     }
     else {
-        icon === null || icon === void 0 ? void 0 : icon.classList.add("fa-refresh", "fa-spin");
+        icon?.classList.add("fa-refresh", "fa-spin");
     }
     text.innerText = msg;
 }
@@ -129,23 +120,21 @@ function CheckTemperatureEndpointAndSet(id) {
         }
     });
 }
-function GetTempsOfServer(host) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(500) });
-            const times = yield response.json();
-            return times;
-        }
-        catch (_a) {
-            return new Promise((resolve, reject) => {
-                resolve({
-                    Type: DataResponseType.Error,
-                    Message: "No Response From Server",
-                    Data: null
-                });
+async function GetTempsOfServer(host) {
+    try {
+        const response = await fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(500) });
+        const times = await response.json();
+        return times;
+    }
+    catch {
+        return new Promise((resolve, reject) => {
+            resolve({
+                Type: DataResponseType.Error,
+                Message: "No Response From Server",
+                Data: null
             });
-        }
-    });
+        });
+    }
 }
 function SubscribeIpEndpoint(ip, obj) {
     LoadingDict.push(obj);
