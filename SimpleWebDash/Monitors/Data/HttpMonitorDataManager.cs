@@ -18,22 +18,38 @@ namespace SimpleWebDash.Monitors.Data
 		public static IpEndpointResponseData GetResponseData(DateTime date, string ID)
 		{
 			HttpMonitorData[] data = GetAllFrom(date, ID);
-			IpEndpointResponseData responseData = new IpEndpointResponseData
+			IpEndpointResponseData response = new IpEndpointResponseData
 			{
 				Total = data.Length,
 				Timeouts = 0,
-				Avg = 0
+				Avg = 0,
+				Min = long.MaxValue,
+				Max = long.MinValue
 			};
 			foreach (HttpMonitorData d in data)
 			{
 				if (!d.Success)
 				{
-					responseData.Timeouts++;
+					response.Timeouts++;
 				}
-				responseData.Avg += d.ResponseTime;
+				else
+				{
+					response.Avg += d.ResponseTime;
+					if (d.ResponseTime < response.Min)
+					{
+						response.Min = d.ResponseTime;
+					}
+					if (d.ResponseTime > response.Max)
+					{
+						response.Max = d.ResponseTime;
+					}
+				}
 			}
-			responseData.Avg /= responseData.Total;
-			return responseData;
+			if (response.Total > 0)
+			{
+				response.Avg /= (response.Total - response.Timeouts);
+			}
+			return response;
 		}
 	}
 }
