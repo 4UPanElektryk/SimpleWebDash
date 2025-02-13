@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using SimpleWebDash.Endpoints;
 
@@ -32,18 +31,16 @@ namespace SimpleWebDash.Monitors.Data
 				if (!d.Success)
 				{
 					response.Timeouts++;
+					continue;
 				}
-				else
+				response.Avg += d.ResponseTime;
+				if (d.ResponseTime < response.Min)
 				{
-					response.Avg += d.ResponseTime;
-					if (d.ResponseTime < response.Min)
-					{
-						response.Min = d.ResponseTime;
-					}
-					if (d.ResponseTime > response.Max)
-					{
-						response.Max = d.ResponseTime;
-					}
+					response.Min = d.ResponseTime;
+				}
+				if (d.ResponseTime > response.Max)
+				{
+					response.Max = d.ResponseTime;
 				}
 			}
 			if (response.Total > 0)
