@@ -98,7 +98,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\4UPanElektryk\NetBase\NetBase\NetBase.csproj">
+    <ProjectReference Include="..\..\NetBase\NetBase\NetBase.csproj">
       <Project>{539351df-ff15-4cf7-866d-3e1628339811}</Project>
       <Name>NetBase</Name>
     </ProjectReference>
