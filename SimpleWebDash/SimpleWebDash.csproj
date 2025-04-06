@@ -75,6 +75,7 @@
     <Compile Include="Endpoints\DataEndpoint.cs" />
     <Compile Include="Endpoints\HttpDataEndpoint.cs" />
     <Compile Include="Endpoints\IpDataEndpoint.cs" />
+    <Compile Include="Endpoints\IpDeteailsDataEndpoint.cs" />
     <Compile Include="Endpoints\IpEndpointResponseData.cs" />
     <Compile Include="Endpoints\TemperatureDataEndpoint.cs" />
     <Compile Include="Endpoints\TemperatureEndpointResponseData.cs" />
