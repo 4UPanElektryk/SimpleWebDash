@@ -61,10 +61,10 @@ namespace SimpleWebDash
 					HTTPPath = config["HTTPMonitorDataPath"].Value;
 					TEMPSPath = config["TEMPSMonitorDataPath"].Value;
 					IPAddres = config["IPAddress"].Value;
-					Port = config["Port"].Value;
+					Port = (int)config["Port"].Value;
 					IsReadOnlyNode = config["ReadOnlyNode"].Value;
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
 					Console.Error.WriteLine("Error parsing config file");
 					Console.Error.WriteLine("Please make sure the config file is in the correct format");
@@ -77,6 +77,9 @@ namespace SimpleWebDash
 					Console.Error.WriteLine("  \"Port\": 8080,");
 					Console.Error.WriteLine("  \"ReadOnlyNode\": true");
 					Console.Error.WriteLine("}");
+#if DEBUG
+					throw ex;
+#endif
 					Environment.Exit(1);
 				}
 			}
