@@ -1,17 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.IO;
 using System.Net;
-using CoolConsole;
-using CoolConsole.MenuItems;
+using System.Collections.Generic;
 using NetBase;
 using NetBase.Communication;
 using NetBase.FileProvider;
 using NetBase.StaticRouting;
-using Newtonsoft.Json.Linq;
 using SimpleWebDash.Endpoints;
 using SimpleWebDash.Monitors;
 using SimpleWebDash.Monitors.Data;
-using System.IO;
-using System;
+using SimpleWebDash.Monitors.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace SimpleWebDash
 {
@@ -20,6 +19,7 @@ namespace SimpleWebDash
 		private static List<DataEndpoint> endpoints;
 		static void Main(string[] args)
 		{
+			Server server = new Server();
 			// replace this mess with a config file if a config file is passed through the command line as an argument
 			// could be a json file or an ini file
 			string IPPath = null;
@@ -28,24 +28,18 @@ namespace SimpleWebDash
 			string IPAddres = null;
 			int Port = 8080;
 			bool IsReadOnlyNode = true;
+			MonitorConfig[] monitorscfg =  new MonitorConfig[]{ 
+				new MonitorConfig()
+				{
+					Type = MonitorType.IP,
+
+				}
+			};
 			if (args.Length != 1)
 			{
-				ReturnCode code = Menu.Show(new List<MenuItem>
-				{
-					new TextboxMenuItem("IP Monitor Data Path", "ips.c.json"),
-					new TextboxMenuItem("HTTP Monitor Data Path", "https.c.json"),
-					new TextboxMenuItem("TEMPS Monitor Data Path", "temps.c.json"),
-					new CheckboxMenuItem("ReadOnlyNode", true),
-					new TextboxMenuItem("IP Address", "127.0.0.1"),
-					new NumboxMenuItem("Port", 8080),
-					new MenuItem("Continue")
-				});
-				IPPath = code.Textboxes[0];
-				HTTPPath = code.Textboxes[1];
-				TEMPSPath = code.Textboxes[2];
-				IPAddres = code.Textboxes[3];
-				Port = code.Numboxes[0];
-				IsReadOnlyNode = code.Checkboxes[0];
+				Console.Error.WriteLine("Missing Configuration!");
+				Console.Error.WriteLine("Please provide a configuration file as an argument");
+				Environment.Exit(1);
 			}
 			else
 			{
@@ -63,6 +57,8 @@ namespace SimpleWebDash
 					IPAddres = config["IPAddress"].Value;
 					Port = (int)config["Port"].Value;
 					IsReadOnlyNode = config["ReadOnlyNode"].Value;
+					monitorscfg = config["Monitors"].ToObject<MonitorConfig[]>();
+
 				}
 				catch (Exception ex)
 				{
@@ -70,12 +66,16 @@ namespace SimpleWebDash
 					Console.Error.WriteLine("Please make sure the config file is in the correct format");
 					Console.Error.WriteLine("The config file should be a json file with the following format:");
 					Console.Error.WriteLine("{");
-					Console.Error.WriteLine("  \"IPMonitorDataPath\": \"ips.c.json\",");
-					Console.Error.WriteLine("  \"HTTPMonitorDataPath\": \"https.c.json\",");
-					Console.Error.WriteLine("  \"TEMPSMonitorDataPath\": \"temps.c.json\",");
+					Console.Error.WriteLine("  \"IPMonitorDataPath\": \"ips.jsonl\",");
+					Console.Error.WriteLine("  \"HTTPMonitorDataPath\": \"https.jsonl\",");
+					Console.Error.WriteLine("  \"TEMPSMonitorDataPath\": \"temps.jsonl\",");
 					Console.Error.WriteLine("  \"IPAddress\": \"127.0.0.1\",");
 					Console.Error.WriteLine("  \"Port\": 8080,");
-					Console.Error.WriteLine("  \"ReadOnlyNode\": true");
+					Console.Error.WriteLine("  \"ReadOnlyNode\": true,");
+					Console.Error.WriteLine("  \"Monitors\": ");
+					Console.Error.WriteLine("  [");
+					Console.Error.WriteLine("    { \"Type\": \"IP\", \"Data\": [\"127.0.0.1\"]}");
+					Console.Error.WriteLine("  ]");
 					Console.Error.WriteLine("}");
 #if DEBUG
 					throw ex;
@@ -84,22 +84,30 @@ namespace SimpleWebDash
 				}
 			}
 
-			Server.router = DataRecieved;
-			Monitor[] monitors = {
-				new IpMonitor("192.168.10.149"),
-				new IpMonitor("192.168.10.251"),
-				new IpMonitor("192.168.10.252"),
-				new IpMonitor("hole.lan"),
-				new TemperatureMonitor("192.168.10.10"),
-				new TemperatureMonitor("192.168.10.11"),
-				new TemperatureMonitor("192.168.10.12"),
-				new HttpMonitor("https://192.168.10.252:8283/login?redirect_url=/apps/dashboard/", "NextCloud"),
-				new HttpMonitor("https://192.168.10.249/live", "NVR")
-			};
+			server.HandeRequest = DataRecieved;
+			Monitor[] monitors = new Monitor[monitorscfg.Length];
+			for (int i = 0; i < monitorscfg.Length; i++)
+			{
+				switch (monitorscfg[i].Type) { 
+					case MonitorType.IP:
+						monitors[i] = new IpMonitor(monitorscfg[i].Data[0]);
+						break;
+					case MonitorType.TEMPS:
+						monitors[i] = new TemperatureMonitor(monitorscfg[i].Data[0], monitorscfg[i].Data[1]);
+						break;
+					case MonitorType.HTTP:
+						monitors[i] = new HttpMonitor(monitorscfg[i].Data[0], monitorscfg[i].Data[1]);
+						break;
+					default:
+						Console.Error.WriteLine("Unknown Monitor Type: " + monitorscfg[i].Type);
+						break;
+				}
+			}
 			endpoints = new List<DataEndpoint>{
 				new IpDataEndpoint("api/ipstatus"),
 				new TemperatureDataEndpoint("api/tempstats"),
-				new HttpDataEndpoint("api/httpstatus")
+				new CombinedTempertatureDataEndpoint("api/fulltempstats"),
+				new HttpDataEndpoint("api/httpstatus"),
 			};
 			IFileLoader loader = new LocalFileLoader("Docs\\");
 			Router.Add(loader, "app.js");
@@ -110,7 +118,7 @@ namespace SimpleWebDash
 			HttpMonitorDataManager.Initialize(HTTPPath);
 			TemperatureMonitorDataManager.Initialize(TEMPSPath);
 			if (!IsReadOnlyNode) { Clock.Start(); }
-			Server.Start(IPAddress.Parse(IPAddres), Port);
+			server.Start(IPAddress.Parse(IPAddres), Port);
 			while (true) { }
 		}
 		public static HttpResponse DataRecieved(HttpRequest request)

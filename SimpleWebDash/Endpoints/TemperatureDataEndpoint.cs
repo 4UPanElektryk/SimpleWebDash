@@ -4,6 +4,7 @@ using SimpleWebDash.Monitors.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace SimpleWebDash.Endpoints
 {
@@ -38,7 +39,7 @@ namespace SimpleWebDash.Endpoints
 					Temps = temps.ToArray()
 				}
 			};
-			HttpResponse response = new HttpResponse(StatusCode.OK, null, JsonConvert.SerializeObject(response1), ContentType.application_json);
+			HttpResponse response = new HttpResponse(StatusCode.OK, JsonConvert.SerializeObject(response1), null, Encoding.UTF8, ContentType.application_json);
 			response.Headers.Add("Access-Control-Allow-Origin", "*");
 			return response;
 		}

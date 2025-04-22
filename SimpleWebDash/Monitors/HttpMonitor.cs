@@ -10,7 +10,7 @@ namespace SimpleWebDash.Monitors
 	{
 		private string _requestString;
 		private string _id;
-		public HttpMonitor(string RequestString, string Id) : base() { _id = Id; _requestString = RequestString; }
+		public HttpMonitor(string Id, string RequestString) : base() { _id = Id; _requestString = RequestString; }
 		public override void OnEvent(object sender, ClockTickEventArgs e)
 		{
 			int timeout = 1000;

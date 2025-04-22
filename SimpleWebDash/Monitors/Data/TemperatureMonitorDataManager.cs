@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SimpleWebDash.Monitors.Data
 {
 	public class TemperatureMonitorDataManager : SaveObjManager<TemperatureMonitorData>
 	{
+		//key = ip, value = node name
+		public static Dictionary<string,string> Nodes = new Dictionary<string, string>();
+		
 		internal const int MAX_ALLOWED_DATA_IN_RESPONSE = 1000;
 		public static TemperatureMonitorData[] GetAllFrom(DateTime date, string IP)
 		{
@@ -22,6 +26,10 @@ namespace SimpleWebDash.Monitors.Data
 			}
 			//Console.WriteLine(Final.Count);
 			return Final.ToArray();
+		}
+		public static async Task<TemperatureMonitorData[]> GetAllFromAsync(DateTime date, string IP)
+		{
+			return await Task.Run(() => GetAllFrom(date, IP));
 		}
 	}
 }

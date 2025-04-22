@@ -4,6 +4,9 @@ enum DataResponseType {
 	Error,
 	Loading,
 }
+interface Dictionary<T> {
+	[Key: string]: T;
+}
 interface ServerDataResponse<T> {
 	Type: DataResponseType,
 	Message: string,
@@ -19,6 +22,10 @@ interface IpEndpointResponseData {
 interface TemperatureEndpointResponseData {
 	Times: Array<number>,
 	Temps: Array<number>,
+}
+interface CombinedTemperatureEndpointResponseData {
+	Nodes: Dictionary<string>,
+    Temperatures: Dictionary<TemperatureEndpointResponseData>
 }
 
 var LoadingDict: Array<string> = [];
@@ -99,7 +106,36 @@ function CheckTemperatureEndpointAndSet(id: string) {
 	if (LoadingDict.includes(id)) {
 		delete LoadingDict[LoadingDict.indexOf(id)];
 	}
-	let Hydrogen = GetTempsOfServer("192.168.10.10");
+	let All = GetTempsOfAllServers();
+	All.then((values) => {
+		if (values.Type == DataResponseType.Error) {
+			if (!LoadingDict.includes(id)) {
+				LoadingDict.push(id);
+			}
+		}
+		else {
+			Temps = new google.visualization.DataTable();
+			Temps.addColumn('datetime', 'Time');
+			for (let i = 0; i < Object.keys(values.Data.Nodes).length; i++) {
+				Temps.addColumn('number', values.Data.Nodes[Object.keys(values.Data.Nodes)[i]] + " °C");
+			}
+			let dominant = 0; 
+			for (let i = 0; i < Object.keys(values.Data.Temperatures).length; i++){
+				if(values.Data.Temperatures[Object.keys(values.Data.Temperatures)[i]].Times.length == Math.max(...Object.values(values.Data.Temperatures).map(x => x.Times.length))){
+					dominant = i;
+				}
+			}
+			for (let i = 0; i < values.Data.Temperatures[Object.keys(values.Data.Temperatures)[dominant]].Times.length; i++) {
+				let row: any[] = [new Date(values.Data.Temperatures[Object.keys(values.Data.Temperatures)[dominant]].Times[i] * 1000)];
+				for (let j = 0; j < Object.keys(values.Data.Nodes).length; j++) {
+					row.push(values.Data.Temperatures[Object.keys(values.Data.Temperatures)[j]].Temps[i]);
+				}
+				Temps.addRows([row]);
+			}
+			drawChart();
+			SensorSimpleSet(id, DataResponseType.Success, "");
+		}
+	/*let Hydrogen = GetTempsOfServer("192.168.10.10");
 	let Helium = GetTempsOfServer("192.168.10.11");
 	let Lithium = GetTempsOfServer("192.168.10.12");
 	Promise.all([Hydrogen, Helium, Lithium]).then((values) => {
@@ -135,11 +171,12 @@ function CheckTemperatureEndpointAndSet(id: string) {
 			SensorSimpleSet(id, DataResponseType.Success, "");
 			//console.log(`Temps: ${values[0].Data.Temps.values[0]} ${values[1].Data.Temps.values[0]} ${values[2].Data.Temps.values[0]}`)
 		}
+	});*/
 	});
 }
 async function GetTempsOfServer(host: string): Promise<ServerDataResponse<TemperatureEndpointResponseData>> {
 	try {
-		const response = await fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(1000) });
+		const response = await fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(2000) });
 		const times = await response.json() as ServerDataResponse<TemperatureEndpointResponseData>;
 		return times;
 	}
@@ -150,6 +187,22 @@ async function GetTempsOfServer(host: string): Promise<ServerDataResponse<Temper
 				Message: "No Response From Server",
 				Data: null
 			} as ServerDataResponse<TemperatureEndpointResponseData>)
+		});
+	}
+}
+async function GetTempsOfAllServers(): Promise<ServerDataResponse<CombinedTemperatureEndpointResponseData>> {
+	try {
+		const response = await fetch(`/api/fulltempstats?t=${timespan.value}`, { signal: AbortSignal.timeout(5000) });
+		const times = await response.json() as ServerDataResponse<CombinedTemperatureEndpointResponseData>;
+		return times;
+	}
+	catch {
+		return new Promise<ServerDataResponse<CombinedTemperatureEndpointResponseData>>((resolve, reject) => {
+			resolve({
+				Type: DataResponseType.Error,
+				Message: "No Response From Server",
+				Data: null
+			} as ServerDataResponse<CombinedTemperatureEndpointResponseData>)
 		});
 	}
 }

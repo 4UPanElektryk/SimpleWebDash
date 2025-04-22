@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using NetBase.RuntimeLogger;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -56,7 +57,7 @@ namespace SimpleWebDash
 				Temp.Clear();
 			}
 			File.AppendAllText(Path, stringBuilder.ToString());
-            Console.WriteLine("Saved to " + Path);
+            Log.Write("Saved to " + Path);
 		}
 		public static void Add(T obj)
 		{

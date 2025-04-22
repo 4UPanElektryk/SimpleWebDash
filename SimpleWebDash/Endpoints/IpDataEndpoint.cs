@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using SimpleWebDash.Monitors.Data;
+using System.Text;
 
 namespace SimpleWebDash.Endpoints
 {
@@ -11,7 +12,6 @@ namespace SimpleWebDash.Endpoints
 		public override HttpResponse ReturnData(HttpRequest request)
 		{
 			int slowNetResponseTime = 50;
-
 			string tspan = request.URLParamenters["t"]; // "0000d00h00m";
 			int days = int.Parse(tspan.Split('d')[0]);
 			int hours = int.Parse(tspan.Split('d')[1].Split('h')[0]);
@@ -45,7 +45,7 @@ namespace SimpleWebDash.Endpoints
 				Message = message,
 				Data = responseData
 			};
-			HttpResponse response = new HttpResponse(StatusCode.OK, null, JsonConvert.SerializeObject(response1), ContentType.application_json);
+			HttpResponse response = new HttpResponse(StatusCode.OK,JsonConvert.SerializeObject(response1), null, Encoding.UTF8, ContentType.application_json);
 			response.Headers.Add("Access-Control-Allow-Origin", "*");
 			return response;
 		}

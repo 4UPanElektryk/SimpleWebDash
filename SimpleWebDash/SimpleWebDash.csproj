@@ -53,9 +53,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CoolConsole, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CoolConsole.1.3.0\lib\netstandard2.0\CoolConsole.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -72,6 +69,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clock.cs" />
+    <Compile Include="Endpoints\CombinedTempertatureDataEndpoint.cs" />
+    <Compile Include="Endpoints\CombinedTempertatureEndpointResponseData.cs" />
     <Compile Include="Endpoints\DataEndpoint.cs" />
     <Compile Include="Endpoints\HttpDataEndpoint.cs" />
     <Compile Include="Endpoints\IpDataEndpoint.cs" />
@@ -79,6 +78,7 @@
     <Compile Include="Endpoints\IpEndpointResponseData.cs" />
     <Compile Include="Endpoints\TemperatureDataEndpoint.cs" />
     <Compile Include="Endpoints\TemperatureEndpointResponseData.cs" />
+    <Compile Include="Monitors\Configuration\MonitorType.cs" />
     <Compile Include="Monitors\Data\HttpMonitorData.cs" />
     <Compile Include="Monitors\Data\HttpMonitorDataManager.cs" />
     <Compile Include="Monitors\HttpMonitor.cs" />
@@ -88,6 +88,7 @@
     <Compile Include="Monitors\Data\IpMonitorData.cs" />
     <Compile Include="Monitors\Data\IpMonitorDataManager.cs" />
     <Compile Include="Monitors\Monitor.cs" />
+    <Compile Include="Monitors\Configuration\MonitorConfig.cs" />
     <Compile Include="Monitors\TemperatureMonitor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

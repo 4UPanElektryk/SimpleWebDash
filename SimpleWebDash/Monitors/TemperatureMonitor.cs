@@ -8,7 +8,7 @@ namespace SimpleWebDash.Monitors
 	public class TemperatureMonitor : Monitor
 	{
 		private string _ip;
-		public TemperatureMonitor(string IpAddress) : base() { _ip = IpAddress; }
+		public TemperatureMonitor(string IpAddress, string NodeName) : base() { _ip = IpAddress; TemperatureMonitorDataManager.Nodes.Add(IpAddress, NodeName); }
 		public override void OnEvent(object sender, ClockTickEventArgs e)
 		{
 			HttpClient client = new HttpClient();
