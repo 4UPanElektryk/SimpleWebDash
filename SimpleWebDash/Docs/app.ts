@@ -25,7 +25,7 @@ interface TemperatureEndpointResponseData {
 }
 interface CombinedTemperatureEndpointResponseData {
 	Nodes: Dictionary<string>,
-    Temperatures: Dictionary<TemperatureEndpointResponseData>
+	Temperatures: Dictionary<TemperatureEndpointResponseData>
 }
 
 var LoadingDict: Array<string> = [];
@@ -103,7 +103,71 @@ function CheckHttpEndpointAndSet(id: string, obj: string) {
 	});
 }
 function CheckTemperatureEndpointAndSet(id: string) {
-	if (LoadingDict.includes(id)) {
+	const jsonData = GetTempsOfAllServers();
+	jsonData.then((jsonData) => {
+		if (jsonData.Type == DataResponseType.Error) {
+			if (!LoadingDict.includes(id)) {
+				LoadingDict.push(id);
+			}
+			return;
+		}
+		else if (LoadingDict.includes(id)) {
+			delete LoadingDict[LoadingDict.indexOf(id)];
+		}
+		const tempData = jsonData.Data.Temperatures;
+		const nodeNames = jsonData.Data.Nodes;
+		const allTimestamps = new Set<number>();
+
+		// Collect all unique timestamps
+		for (const node in tempData) {
+			tempData[node].Times.forEach(ts => allTimestamps.add(ts));
+		}
+
+		const sortedTimestamps = Array.from(allTimestamps).sort((a, b) => a - b);
+		
+		// Map timestamps to temperature data per node
+		interface TimeRow {
+			time: Date;
+			[node: string]: Date | number | null;
+		}
+		const timestampMap: Record<number, TimeRow> = {};
+		sortedTimestamps.forEach(ts => {
+			timestampMap[ts] = { time: new Date(ts * 1000) };
+		});
+		// Fill in temperature readings
+		for (const ip in tempData) {
+			const label = nodeNames[ip] ?? ip;
+			const times = tempData[ip].Times;
+			const temps = tempData[ip].Temps;
+
+			times.forEach((ts, idx) => {
+				timestampMap[ts][label] = temps[idx];
+			});
+		}
+
+		// Initialize Google DataTable
+		const data = new google.visualization.DataTable();
+		data.addColumn('datetime', 'Time');
+
+		const labels = Object.values(nodeNames);
+		labels.forEach(label => data.addColumn('number', label));
+
+		const rows = sortedTimestamps.map(ts => {
+			const row = [new Date(ts * 1000)] as (Date | number | null)[];
+			labels.forEach(label => row.push(timestampMap[ts][label] ?? null));
+			return row;
+		});
+
+		data.addRows(rows);
+		Temps = data;
+		drawChart();
+		SensorSimpleSet(id, DataResponseType.Success, "");
+	}).catch((x) => {
+		if (!LoadingDict.includes(id)) {
+			LoadingDict.push(id);
+		}
+	});
+	/*if (LoadingDict.includes(id)) {
 		delete LoadingDict[LoadingDict.indexOf(id)];
 	}
 	let All = GetTempsOfAllServers();
@@ -134,7 +198,7 @@ function CheckTemperatureEndpointAndSet(id: string) {
 			}
 			drawChart();
 			SensorSimpleSet(id, DataResponseType.Success, "");
-		}
+		}*/
 	/*let Hydrogen = GetTempsOfServer("192.168.10.10");
 	let Helium = GetTempsOfServer("192.168.10.11");
 	let Lithium = GetTempsOfServer("192.168.10.12");
@@ -172,7 +236,6 @@ function CheckTemperatureEndpointAndSet(id: string) {
 			//console.log(`Temps: ${values[0].Data.Temps.values[0]} ${values[1].Data.Temps.values[0]} ${values[2].Data.Temps.values[0]}`)
 		}
 	});*/
-	});
 }
 async function GetTempsOfServer(host: string): Promise<ServerDataResponse<TemperatureEndpointResponseData>> {
 	try {
@@ -221,7 +284,7 @@ function SubscribeTemperatureEndpoint(obj: string) {
 		CheckTemperatureEndpointAndSet(obj);
 	}, 30000);
 }
-function SubscribeHttpEndpoint(id: string, obj: string){
+function SubscribeHttpEndpoint(id: string, obj: string) {
 	LoadingDict.push(obj);
 	CheckHttpEndpointAndSet(id, obj);
 	setInterval(() => {
@@ -238,14 +301,10 @@ SubscribeHttpEndpoint("NextCloud", "NextCloud");
 
 function SetupAfterGoogleChartsLoad() {
 	Temps = new google.visualization.DataTable();
-	Temps.addColumn('datetime', 'Time');
-	Temps.addColumn('number', 'Hydrogen °C');
-	Temps.addColumn('number', 'Helium °C');
-	Temps.addColumn('number', 'Lithium °C');
 	SubscribeTemperatureEndpoint("Temperature");
 }
 function drawChart() {
-	let t = +timespan.value.substring(0,4) * 86400000 + +timespan.value.substring(5,7) * 3600000 + +timespan.value.substring(8,10) * 60000;
+	let t = +timespan.value.substring(0, 4) * 86400000 + +timespan.value.substring(5, 7) * 3600000 + +timespan.value.substring(8, 10) * 60000;
 	const options = {
 		title: 'Server Temperature',
 		backgroundColor: 'transparent',
@@ -266,10 +325,12 @@ function drawChart() {
 			},
 		},
 		vAxis: {
+			title: 'Temperature °C',
 			textStyle: { color: '#FFF' },
 			minValue: 0,
 			maxValue: 100,
 		},
+		interpolateNulls: true,
 		legend: 'none',
 		chartArea: {
 			right: 10,

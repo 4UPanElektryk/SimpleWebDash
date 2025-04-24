@@ -118,7 +118,7 @@ namespace SimpleWebDash
 			HttpMonitorDataManager.Initialize(HTTPPath);
 			TemperatureMonitorDataManager.Initialize(TEMPSPath);
 			if (!IsReadOnlyNode) { Clock.Start(); }
-			server.Start(IPAddress.Parse(IPAddres), Port);
+			server.Start($"http://{IPAddres}:{Port}/");
 			while (true) { }
 		}
 		public static HttpResponse DataRecieved(HttpRequest request)
