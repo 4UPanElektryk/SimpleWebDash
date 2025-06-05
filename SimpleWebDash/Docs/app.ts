@@ -298,6 +298,12 @@ SubscribeIpEndpoint("192.168.10.252", "TrueNas");
 SubscribeIpEndpoint("192.168.10.149", "VPN");
 SubscribeHttpEndpoint("NVR", "NVR");
 SubscribeHttpEndpoint("NextCloud", "NextCloud");
+SubscribeHttpEndpoint("HomeAssistant", "HomeAssistant");
+SubscribeHttpEndpoint("Ollama", "Ollama");
+SubscribeHttpEndpoint("GitLab", "GitLab");
+SubscribeHttpEndpoint("WebInternal1", "WebInternal1");
+SubscribeHttpEndpoint("DatabaseInternal1", "DatabaseInternal1");
+SubscribeHttpEndpoint("Proxy", "Proxy");
 
 function SetupAfterGoogleChartsLoad() {
 	Temps = new google.visualization.DataTable();
