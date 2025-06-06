@@ -27,14 +27,23 @@ namespace SimpleWebDash.Monitors
 			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, _requestString);
 			client.Timeout = new TimeSpan(0,0,0,0,timeout);
 			Stopwatch stopwatch = Stopwatch.StartNew();
-			Task<HttpResponseMessage> httpResponse = client.SendAsync(request);
-			httpResponse.Wait();
+			bool success = false;
+			try
+			{
+				Task<HttpResponseMessage> httpResponse = client.SendAsync(request);
+				httpResponse.Wait();
+				success = httpResponse.Result.IsSuccessStatusCode;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"{e.TickTime} {this.GetType().Name}:\nException occured: {ex.Message}\nStack Trace: {ex.StackTrace}");
+			}
 			stopwatch.Stop();
 			HttpMonitorDataManager.Add(new HttpMonitorData()
 			{
 				ID = _id,
 				ResponseTime = stopwatch.ElapsedMilliseconds,
-				Success = httpResponse.Result.StatusCode == System.Net.HttpStatusCode.OK,
+				Success = success,
 				Time = e.TickTime
 			});
 		}
