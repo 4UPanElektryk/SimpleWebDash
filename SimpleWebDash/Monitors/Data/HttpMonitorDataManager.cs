@@ -45,7 +45,11 @@ namespace SimpleWebDash.Monitors.Data
 			}
 			if (response.Total > 0)
 			{
-				response.Avg /= (response.Total - response.Timeouts);
+				int dev = response.Total - response.Timeouts;
+				if (dev == 0)
+					response.Avg = 0;
+				else
+					response.Avg /= (response.Total - response.Timeouts);
 			}
 			return response;
 		}
