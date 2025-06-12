@@ -11,7 +11,7 @@ namespace SimpleWebDash.Endpoints
 		public HttpDataEndpoint(string url) : base(url) { }
 		public override HttpResponse ReturnData(HttpRequest request)
 		{
-			int slowNetResponseTime = 150;
+			int slowNetResponseTime = 300;
 
 			string tspan = request.URLParamenters["t"]; // "0000d00h00m";
 			int days = int.Parse(tspan.Split('d')[0]);
