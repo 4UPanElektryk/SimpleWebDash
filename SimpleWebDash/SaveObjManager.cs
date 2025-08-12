@@ -1,9 +1,9 @@
 ﻿using NetBase.RuntimeLogger;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SimpleWebDash
 {
@@ -12,12 +12,12 @@ namespace SimpleWebDash
 		protected static List<T> Saved;
 		protected static List<T> Temp;
 		protected static string Path;
-		public static void Initialize(string path)
+		public static async Task Initialize(string path)
 		{
 			Saved = new List<T>();
 			Temp = new List<T>();
 			Path = path;
-			Saved = Load();
+			Saved = await Load();
 		}
 		public static string Serialize(T obj)
 		{
@@ -27,7 +27,7 @@ namespace SimpleWebDash
 		{
 			return JsonConvert.DeserializeObject<T>(obj);
 		}
-		public static List<T> Load()
+		public static async Task<List<T>> Load()
 		{
 			if (!File.Exists(Path))
 			{
