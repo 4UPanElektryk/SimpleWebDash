@@ -11,6 +11,8 @@ using SimpleWebDash.Monitors;
 using SimpleWebDash.Monitors.Data;
 using SimpleWebDash.Monitors.Configuration;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using NetBase.RuntimeLogger;
 
 namespace SimpleWebDash
 {
@@ -114,12 +116,20 @@ namespace SimpleWebDash
 			Router.Add(loader, "index.html", "");
 			Router.Add(loader, "index.html");
 			Router.Add(loader, "style.css");
-			IpMonitorDataManager.Initialize(IPPath);
-			HttpMonitorDataManager.Initialize(HTTPPath);
-			TemperatureMonitorDataManager.Initialize(TEMPSPath);
+			Log.Write("Loading Data");
+			ManagerInit(IPPath, HTTPPath, TEMPSPath);
+			Log.Write("Data Loaded");
 			if (!IsReadOnlyNode) { Clock.Start(); }
 			server.Start($"http://{IPAddres}:{Port}/");
 			while (true) { }
+		}
+		private async static void ManagerInit(string ipmgrPath, string httpmgrPath, string tempmgrPath)
+		{
+			await Task.WhenAll(
+				IpMonitorDataManager.Initialize(ipmgrPath),
+				HttpMonitorDataManager.Initialize(httpmgrPath),
+				TemperatureMonitorDataManager.Initialize(tempmgrPath)
+			);
 		}
 		public static HttpResponse DataRecieved(HttpRequest request)
 		{
