@@ -89,6 +89,7 @@
     <Compile Include="Clock.cs" />
     <Compile Include="Endpoints\CombinedTempertatureDataEndpoint.cs" />
     <Compile Include="Endpoints\CombinedTempertatureEndpointResponseData.cs" />
+    <Compile Include="Endpoints\ConfigurationEndpoint.cs" />
     <Compile Include="Endpoints\DataEndpoint.cs" />
     <Compile Include="Endpoints\HttpDataEndpoint.cs" />
     <Compile Include="Endpoints\IpDataEndpoint.cs" />

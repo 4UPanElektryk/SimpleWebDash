@@ -12,7 +12,7 @@ using SimpleWebDash.Monitors.Data;
 using SimpleWebDash.Monitors.Configuration;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
-using NetBase.RuntimeLogger;
+using NetBase.Runtime;
 
 namespace SimpleWebDash
 {
@@ -22,6 +22,7 @@ namespace SimpleWebDash
 		static void Main(string[] args)
 		{
 			Server server = new Server();
+			Router router = new Router();
 			// replace this mess with a config file if a config file is passed through the command line as an argument
 			// could be a json file or an ini file
 			string IPPath = null;
@@ -76,7 +77,7 @@ namespace SimpleWebDash
 					Console.Error.WriteLine("  \"ReadOnlyNode\": true,");
 					Console.Error.WriteLine("  \"Monitors\": ");
 					Console.Error.WriteLine("  [");
-					Console.Error.WriteLine("    { \"Type\": \"IP\", \"Data\": [\"127.0.0.1\"]}");
+					Console.Error.WriteLine("    { \"ID\": \"localhost\", \"FriendlyName\": \"Server Working\" \"Type\": \"IP\", \"Data\": [\"127.0.0.1\"]}");
 					Console.Error.WriteLine("  ]");
 					Console.Error.WriteLine("}");
 #if DEBUG
@@ -94,8 +95,9 @@ namespace SimpleWebDash
 					case MonitorType.IP:
 						monitors[i] = new IpMonitor(monitorscfg[i].Data[0]);
 						break;
-					case MonitorType.TEMPS:
+					case MonitorType.GAS:
 						monitors[i] = new TemperatureMonitor(monitorscfg[i].Data[0], monitorscfg[i].Data[1]);
+						//TODO: implement G
 						break;
 					case MonitorType.HTTP:
 						monitors[i] = new HttpMonitor(monitorscfg[i].Data[0], monitorscfg[i].Data[1]);
@@ -112,13 +114,15 @@ namespace SimpleWebDash
 				new HttpDataEndpoint("api/httpstatus"),
 			};
 			IFileLoader loader = new LocalFileLoader("Docs\\");
-			Router.Add(loader, "app.js");
-			Router.Add(loader, "index.html", "");
-			Router.Add(loader, "index.html");
-			Router.Add(loader, "style.css");
-			Log.Write("Loading Data");
+			Log log = new Log(null);
+			log._prefix = "Program";
+			router.Add(loader, "app.js");
+			router.Add(loader, "index.html", "");
+			router.Add(loader, "index.html");
+			router.Add(loader, "style.css");
+			log.Write("Loading Data");
 			ManagerInit(IPPath, HTTPPath, TEMPSPath);
-			Log.Write("Data Loaded");
+			log.Write("Data Loaded");
 			if (!IsReadOnlyNode) { Clock.Start(); }
 			server.Start($"http://{IPAddres}:{Port}/");
 			while (true) { }

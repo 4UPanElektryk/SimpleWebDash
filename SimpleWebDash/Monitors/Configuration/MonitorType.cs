@@ -4,6 +4,6 @@
 	{
 		IP,
 		HTTP,
-		TEMPS
+		GAS // Guest Additions Service
 	}
 }

@@ -4,31 +4,46 @@ enum DataResponseType {
 	Error,
 	Loading,
 }
-interface Dictionary<T> {
-	[Key: string]: T;
-}
-interface ServerDataResponse<T> {
-	Type: DataResponseType,
-	Message: string,
-	Data: T
-}
-interface IpEndpointResponseData {
-	Min: number,
-	Max: number,
-	Avg: number,
-	Timeouts: number,
-	Total: number
-}
-interface TemperatureEndpointResponseData {
-	Times: Array<number>,
-	Temps: Array<number>,
-}
-interface CombinedTemperatureEndpointResponseData {
-	Nodes: Dictionary<string>,
-	Temperatures: Dictionary<TemperatureEndpointResponseData>
+class SimpleSensor {
+	name: string;
+	object: HTMLElement;
+	isLoading: boolean = true;
+	SetDisplay(type: DataResponseType, msg: string): void {
+		let icon = this.object.querySelector(`#${this.name}-icon`) as HTMLElement;
+		let text = this.object.querySelector(`#${this.name}-msg`) as HTMLElement;
+		icon?.classList.remove("fa-check", "fa-exclamation-triangle", "fa-times", "fa-refresh", "fa-spin");
+		this.object?.classList.remove("s-ok", "s-warning", "s-error");
+		this.isLoading = false;
+		if (type == DataResponseType.Success) {
+			icon?.classList.add("fa-check");
+			this.object?.classList.add("s-ok");
+		} else if (type == DataResponseType.Warning) {
+			icon?.classList.add("fa-exclamation-triangle");
+			this.object?.classList.add("s-warning");
+		}
+		else if (type == DataResponseType.Error) {
+			icon?.classList.add("fa-times");
+			this.object?.classList.add("s-error");
+		}
+		else {
+			icon?.classList.add("fa-refresh", "fa-spin")
+			this.isLoading = true;
+		}
+		text!.innerText = msg;
+	}
+	constructor(name: string, displayText: string, parrent: HTMLElement) {
+		this.name = name;
+		this.object = document.createElement("div");
+		this.object.classList.add("sensor-single");
+		this.object.id = name;
+		this.object.innerHTML = `
+				<span class="big"><i class="fa" aria-hidden="true" id="${name}-icon"></i>${displayText}</span>
+				<span class="small" id="${name}-msg"></span>
+			`;
+	}
 }
 
-var LoadingDict: Array<string> = [];
+var Sensors: Array<SimpleSensor> = [];
 
 const timespan = document.getElementById("period") as HTMLSelectElement;
 timespan.addEventListener("change", () => {
@@ -285,7 +300,6 @@ function SubscribeTemperatureEndpoint(obj: string) {
 	}, 30000);
 }
 function SubscribeHttpEndpoint(id: string, obj: string) {
-	LoadingDict.push(obj);
 	CheckHttpEndpointAndSet(id, obj);
 	setInterval(() => {
 		CheckHttpEndpointAndSet(id, obj);
@@ -351,21 +365,25 @@ function drawChart() {
 }
 let cycle = 0;
 setInterval(() => {
+	let str = "";
 	if (cycle == 0) {
-		LoadingDict.forEach(element => {
-			SensorSimpleSet(element, DataResponseType.Loading, "Loading.");
-		});
+		str = "Loading.";
 	}
 	else if (cycle == 1) {
-		LoadingDict.forEach(element => {
-			SensorSimpleSet(element, DataResponseType.Loading, "Loading..");
-		});
+		str = "Loading..";
 	}
 	else if (cycle == 2) {
-		LoadingDict.forEach(element => {
-			SensorSimpleSet(element, DataResponseType.Loading, "Loading...");
-		});
+        str = "Loading...";
 	}
+	Sensors.forEach(element => {
+		if (element.isLoading) {
+			SensorSimpleSet(element.name, DataResponseType.Loading, str);
+		}
+	});
 	cycle++;
 	cycle = cycle % 3;
 }, 500);
+
+function FetchConfiguration() {
+
+}
