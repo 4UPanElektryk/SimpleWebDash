@@ -12,7 +12,7 @@
 app.js
 *.css
 *.map
-
+*.tsbuildinfo
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

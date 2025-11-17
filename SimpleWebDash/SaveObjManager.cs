@@ -45,7 +45,7 @@ namespace SimpleWebDash
 		public static void Save()
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			lock(Temp)
+			lock (Temp)
 			{
 				foreach (T obj in Temp)
 				{
@@ -56,7 +56,7 @@ namespace SimpleWebDash
 				Temp.Clear();
 			}
 			File.AppendAllText(Path, stringBuilder.ToString());
-            Program.log.Write("Saved to " + Path);
+			Program.log.Write("Saved to " + Path);
 		}
 		public static void Add(T obj)
 		{

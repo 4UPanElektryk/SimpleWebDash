@@ -1,6 +1,9 @@
 {
-    "compilerOptions": {
-        "target": "ES2020",
-        "removeComments": true
-    }
+  "compilerOptions": {
+    "target": "ES2020",
+    "removeComments": true,
+    "tsBuildInfoFile": null,
+    "listEmittedFiles": true,
+    "incremental": false
+  }
 }

@@ -17,7 +17,7 @@ namespace SimpleWebDash.Monitors
 			{
 				temps = JsonConvert.DeserializeObject<int[]>(client.GetStringAsync($"http://{_ip}:3000/temps").Result);
 			}
-			catch 
+			catch
 			{
 				TemperatureMonitorDataManager.Add(new TemperatureMonitorData()
 				{

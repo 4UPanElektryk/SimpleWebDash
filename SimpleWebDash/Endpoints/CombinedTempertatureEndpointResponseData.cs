@@ -2,9 +2,9 @@
 
 namespace SimpleWebDash.Endpoints
 {
-    public struct CombinedTempertatureEndpointResponseData
-    {
-        public Dictionary<string, string> Nodes { get; set; }
+	public struct CombinedTempertatureEndpointResponseData
+	{
+		public Dictionary<string, string> Nodes { get; set; }
 		public Dictionary<string, TemperatureEndpointResponseData> Temperatures { get; set; }
 
 	}

@@ -20,7 +20,7 @@ namespace SimpleWebDash.Endpoints
 			TimeSpan span = new TimeSpan(days, hours, minutes, 0);
 			DateTime start = DateTime.UtcNow - span;
 			IpEndpointResponseData responseData = HttpMonitorDataManager.GetResponseData(start, request.URLParamenters["id"]);
-			
+
 			string message = "OK";
 			DataResponseType responseType = DataResponseType.Success;
 			if (responseData.Avg > slowNetResponseTime)
