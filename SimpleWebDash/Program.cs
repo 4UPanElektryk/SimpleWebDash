@@ -133,7 +133,7 @@ namespace SimpleWebDash
 		{
 			await Task.WhenAll(
 				IpMonitorDataManager.Initialize(ipmgrPath),
-				TemperatureMonitorDataManager.Initialize(httpmgrPath),
+				HttpMonitorDataManager.Initialize(httpmgrPath),
 				TemperatureMonitorDataManager.Initialize(tempmgrPath)
 			);
 		}
