@@ -8,8 +8,8 @@ namespace SimpleWebDash
 {
 	public class SaveObjManager<T>
 	{
-		protected static List<T> Saved;
-		protected static List<T> Temp;
+		public static List<T> Saved;
+		public static List<T> Temp;
 		protected static string Path;
 		public static async Task Initialize(string path)
 		{
