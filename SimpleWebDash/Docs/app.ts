@@ -33,6 +33,10 @@ class SimpleSensor {
 	}
 	constructor(name: string, displayText: string, parrent: HTMLElement) {
 		this.name = name;
+        if (parrent.classList.contains("sensor-set")) {
+			this.object = document.getElementById(name);
+			return;
+        }
 		this.object = document.createElement("div");
 		this.object.classList.add("sensor-single");
 		this.object.id = name;
@@ -76,34 +80,28 @@ function SensorSimpleSet(obj: string, type: DataResponseType, msg: string,) {
 	text!.innerText = msg;
 }
 function CheckIpEndpointAndSet(ip: string, obj: string) {
+	let index = Sensors.findIndex((e) => e.name == obj);
 	fetch(`/api/ipstatus?ip=${ip}&t=${timespan.value}`).then((x) => x.json()).then((x) => {
 		let res = x as ServerDataResponse<IpEndpointResponseData>;
-		if (LoadingDict.includes(obj)) {
-			delete LoadingDict[LoadingDict.indexOf(obj)];
-		}
 		if (res.Type == DataResponseType.Success) {
-			SensorSimpleSet(obj, res.Type, `Min: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\n`);
+			Sensors[index].SetDisplay(res.Type, `Min: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\n`);
 		}
 		else if (res.Type == DataResponseType.Warning) {
-			SensorSimpleSet(obj, res.Type, `${res.Message}\nMin: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\nFail: ${res.Data.Timeouts} / ${res.Data.Total}`);
+			Sensors[index].SetDisplay(res.Type, `${res.Message}\nMin: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\nFail: ${res.Data.Timeouts} / ${res.Data.Total}`);
 		}
 		else {
-			SensorSimpleSet(obj, res.Type, res.Message);
+			Sensors[index].SetDisplay(res.Type, res.Message);
 		}
 	}).catch((x) => {
-		if (!LoadingDict.includes(obj)) {
-			LoadingDict.push(obj);
-		}
+		Sensors[index].isLoading = true;
 	});
 }
 function CheckHttpEndpointAndSet(id: string, obj: string) {
+	let index = Sensors.findIndex((e) => e.name == obj);
 	fetch(`/api/httpstatus?id=${id}&t=${timespan.value}`).then((x) => x.json()).then((x) => {
 		let res = x as ServerDataResponse<IpEndpointResponseData>;
-		if (LoadingDict.includes(obj)) {
-			delete LoadingDict[LoadingDict.indexOf(obj)];
-		}
 		if (res.Type == DataResponseType.Success) {
-			SensorSimpleSet(obj, res.Type, `Min: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\n`);
+			Sensors[index].SetDisplay(res.Type, `Min: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\n`);
 		}
 		else if (res.Type == DataResponseType.Warning) {
 			SensorSimpleSet(obj, res.Type, `${res.Message}\nMin: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\nFail: ${res.Data.Timeouts} / ${res.Data.Total}`);

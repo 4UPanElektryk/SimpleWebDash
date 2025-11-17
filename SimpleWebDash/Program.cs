@@ -19,10 +19,13 @@ namespace SimpleWebDash
 	internal class Program
 	{
 		private static List<DataEndpoint> endpoints;
+		public static Log log;
 		static void Main(string[] args)
 		{
 			Server server = new Server();
 			Router router = new Router();
+			log = new Log(null);
+			log._prefix = "Program";
 			// replace this mess with a config file if a config file is passed through the command line as an argument
 			// could be a json file or an ini file
 			string IPPath = null;
@@ -114,8 +117,6 @@ namespace SimpleWebDash
 				new HttpDataEndpoint("api/httpstatus"),
 			};
 			IFileLoader loader = new LocalFileLoader("Docs\\");
-			Log log = new Log(null);
-			log._prefix = "Program";
 			router.Add(loader, "app.js");
 			router.Add(loader, "index.html", "");
 			router.Add(loader, "index.html");
