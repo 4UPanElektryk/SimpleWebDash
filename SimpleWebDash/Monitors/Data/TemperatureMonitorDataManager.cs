@@ -7,8 +7,8 @@ namespace SimpleWebDash.Monitors.Data
 	public class TemperatureMonitorDataManager : SaveObjManager<TemperatureMonitorData>
 	{
 		//key = ip, value = node name
-		public static Dictionary<string,string> Nodes = new Dictionary<string, string>();
-		
+		public static Dictionary<string, string> Nodes = new Dictionary<string, string>();
+
 		internal const int MAX_ALLOWED_DATA_IN_RESPONSE = 1000;
 		public static TemperatureMonitorData[] GetAllFrom(DateTime date, string IP)
 		{

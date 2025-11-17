@@ -1,8 +1,8 @@
 ﻿using SimpleWebDash.Monitors.Data;
+using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System;
 
 namespace SimpleWebDash.Monitors
 {
@@ -13,7 +13,7 @@ namespace SimpleWebDash.Monitors
 		public HttpMonitor(string Id, string RequestString) : base() { _id = Id; _requestString = RequestString; }
 		public override void OnEvent(object sender, ClockTickEventArgs e)
 		{
-			int timeout = 1000;
+			int timeout = 2000;
 
 			var handler = new HttpClientHandler();
 			handler.ClientCertificateOptions = ClientCertificateOption.Manual;
@@ -25,7 +25,7 @@ namespace SimpleWebDash.Monitors
 
 			HttpClient client = new HttpClient(handler);
 			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, _requestString);
-			client.Timeout = new TimeSpan(0,0,0,0,timeout);
+			client.Timeout = new TimeSpan(0, 0, 0, 0, timeout);
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			bool success = false;
 			try
@@ -36,7 +36,7 @@ namespace SimpleWebDash.Monitors
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"{e.TickTime} {this.GetType().Name}:\nException occured: {ex.Message}\nStack Trace: {ex.StackTrace}");
+				Console.WriteLine($"{e.TickTime} {this.GetType().Name}: {_id}\nException occured: {ex.Message}\nStack Trace: {ex.StackTrace}\n");
 			}
 			stopwatch.Stop();
 			HttpMonitorDataManager.Add(new HttpMonitorData()

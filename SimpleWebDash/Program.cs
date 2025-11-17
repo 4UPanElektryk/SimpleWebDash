@@ -1,18 +1,18 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Collections.Generic;
-using NetBase;
+﻿using NetBase;
 using NetBase.Communication;
 using NetBase.FileProvider;
+using NetBase.Runtime;
 using NetBase.StaticRouting;
+using Newtonsoft.Json.Linq;
 using SimpleWebDash.Endpoints;
 using SimpleWebDash.Monitors;
-using SimpleWebDash.Monitors.Data;
 using SimpleWebDash.Monitors.Configuration;
-using Newtonsoft.Json.Linq;
+using SimpleWebDash.Monitors.Data;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using NetBase.Runtime;
 
 namespace SimpleWebDash
 {
@@ -20,6 +20,7 @@ namespace SimpleWebDash
 	{
 		private static List<DataEndpoint> endpoints;
 		public static Log log;
+		public static MonitorConfig[] monitorConfigs;
 		static void Main(string[] args)
 		{
 			Server server = new Server();
@@ -34,13 +35,7 @@ namespace SimpleWebDash
 			string IPAddres = null;
 			int Port = 8080;
 			bool IsReadOnlyNode = true;
-			MonitorConfig[] monitorscfg =  new MonitorConfig[]{ 
-				new MonitorConfig()
-				{
-					Type = MonitorType.IP,
-
-				}
-			};
+			MonitorConfig[] monitorscfg = new MonitorConfig[] { };
 			if (args.Length != 1)
 			{
 				Console.Error.WriteLine("Missing Configuration!");
@@ -89,32 +84,36 @@ namespace SimpleWebDash
 					Environment.Exit(1);
 				}
 			}
-
-			server.HandeRequest = DataRecieved;
+			List<MonitorConfig> configs = monitorscfg.ToList();
+			configs.Sort((a, b) => a.ID.CompareTo(b.ID));
+			monitorscfg = configs.ToArray();
 			Monitor[] monitors = new Monitor[monitorscfg.Length];
 			for (int i = 0; i < monitorscfg.Length; i++)
 			{
-				switch (monitorscfg[i].Type) { 
+				switch (monitorscfg[i].Type)
+				{
 					case MonitorType.IP:
 						monitors[i] = new IpMonitor(monitorscfg[i].Data[0]);
 						break;
 					case MonitorType.GAS:
-						monitors[i] = new TemperatureMonitor(monitorscfg[i].Data[0], monitorscfg[i].Data[1]);
-						//TODO: implement G
+						monitors[i] = new TemperatureMonitor(monitorscfg[i].Data[0], monitorscfg[i].ID);
+						//TODO: implement Guest Additions Monitor
 						break;
 					case MonitorType.HTTP:
-						monitors[i] = new HttpMonitor(monitorscfg[i].Data[0], monitorscfg[i].Data[1]);
+						monitors[i] = new HttpMonitor(monitorscfg[i].ID, monitorscfg[i].Data[0]);
 						break;
 					default:
 						Console.Error.WriteLine("Unknown Monitor Type: " + monitorscfg[i].Type);
 						break;
 				}
 			}
+			monitorConfigs = monitorscfg;
 			endpoints = new List<DataEndpoint>{
 				new IpDataEndpoint("api/ipstatus"),
 				new TemperatureDataEndpoint("api/tempstats"),
 				new CombinedTempertatureDataEndpoint("api/fulltempstats"),
 				new HttpDataEndpoint("api/httpstatus"),
+				new ConfigurationEndpoint("api/configuration"),
 			};
 			IFileLoader loader = new LocalFileLoader("Docs\\");
 			router.Add(loader, "app.js");
@@ -125,6 +124,8 @@ namespace SimpleWebDash
 			ManagerInit(IPPath, HTTPPath, TEMPSPath);
 			log.Write("Data Loaded");
 			if (!IsReadOnlyNode) { Clock.Start(); }
+			server.HandeRequest = router.OnRequest;
+			router.HandeRequest = DataRecieved;
 			server.Start($"http://{IPAddres}:{Port}/");
 			while (true) { }
 		}
@@ -132,13 +133,14 @@ namespace SimpleWebDash
 		{
 			await Task.WhenAll(
 				IpMonitorDataManager.Initialize(ipmgrPath),
-				HttpMonitorDataManager.Initialize(httpmgrPath),
+				TemperatureMonitorDataManager.Initialize(httpmgrPath),
 				TemperatureMonitorDataManager.Initialize(tempmgrPath)
 			);
 		}
 		public static HttpResponse DataRecieved(HttpRequest request)
 		{
-			if (request.Method == HttpMethod.GET) { 
+			if (request.Method == HttpMethod.GET)
+			{
 				return GetRequestRecieved(request);
 			}
 			return new HttpResponse(StatusCode.Method_Not_Allowed);

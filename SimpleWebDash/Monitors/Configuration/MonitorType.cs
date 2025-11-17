@@ -2,8 +2,8 @@
 {
 	public enum MonitorType
 	{
-		IP,
-		HTTP,
-		GAS // Guest Additions Service
+		IP = 0,
+		HTTP = 1,
+		GAS = 2 // Guest Additions Service
 	}
 }

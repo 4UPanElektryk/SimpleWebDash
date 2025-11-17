@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using NetBase.Communication;
+using Newtonsoft.Json;
+using SimpleWebDash.Monitors.Configuration;
 using System.Text;
-using System.Threading.Tasks;
-using NetBase.Communication;
 
 namespace SimpleWebDash.Endpoints
 {
@@ -14,16 +12,27 @@ namespace SimpleWebDash.Endpoints
 		{
 			string message = "OK";
 			DataResponseType responseType = DataResponseType.Success;
+			MonitorConfig[] currentConfig = Program.monitorConfigs;
+			SafeMonitorConfig[] safeConfigs = new SafeMonitorConfig[currentConfig.Length];
+			for (int i = 0; i < currentConfig.Length; i++)
+			{
+				safeConfigs[i] = new SafeMonitorConfig()
+				{
+					ID = currentConfig[i].ID,
+					FriendlyName = currentConfig[i].FriendlyName,
+					Type = currentConfig[i].Type
+				};
+			}
 			ServerDataResponse<ConfigurationEndpointResponseData> response1 = new ServerDataResponse<ConfigurationEndpointResponseData>()
 			{
 				Type = responseType,
 				Message = message,
 				Data = new ConfigurationEndpointResponseData()
 				{
-					Configuration = SimpleWebDash.ConfigurationManager.GetCurrentConfiguration(),
+					Configuration = safeConfigs
 				}
 			};
-			HttpResponse response = new HttpResponse(StatusCode.OK, Newtonsoft.Json.JsonConvert.SerializeObject(response1), null, Encoding.UTF8, ContentType.application_json);
+			HttpResponse response = new HttpResponse(StatusCode.OK, JsonConvert.SerializeObject(response1), null, Encoding.UTF8, ContentType.application_json);
 			response.Headers.Add("Access-Control-Allow-Origin", "*");
 			return response;
 		}

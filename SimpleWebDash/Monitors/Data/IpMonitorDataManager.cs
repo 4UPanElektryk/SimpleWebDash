@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SimpleWebDash.Endpoints;
+using System;
 using System.Collections.Generic;
-using SimpleWebDash.Endpoints;
 
 namespace SimpleWebDash.Monitors.Data
 {
@@ -46,7 +46,7 @@ namespace SimpleWebDash.Monitors.Data
 			if (response.Total > 0)
 			{
 				int dev = response.Total - response.Timeouts;
-				if (dev == 0) 
+				if (dev == 0)
 					response.Avg = 0;
 				else
 					response.Avg /= (response.Total - response.Timeouts);
