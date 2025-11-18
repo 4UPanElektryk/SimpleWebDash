@@ -1,5 +1,4 @@
-﻿using NetBase.RuntimeLogger;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -9,8 +8,8 @@ namespace SimpleWebDash
 {
 	public class SaveObjManager<T>
 	{
-		protected static List<T> Saved;
-		protected static List<T> Temp;
+		public static List<T> Saved;
+		public static List<T> Temp;
 		protected static string Path;
 		public static async Task Initialize(string path)
 		{
@@ -46,7 +45,7 @@ namespace SimpleWebDash
 		public static void Save()
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			lock(Temp)
+			lock (Temp)
 			{
 				foreach (T obj in Temp)
 				{
@@ -57,7 +56,7 @@ namespace SimpleWebDash
 				Temp.Clear();
 			}
 			File.AppendAllText(Path, stringBuilder.ToString());
-            Log.Write("Saved to " + Path);
+			Program.log.Write("Saved to " + Path);
 		}
 		public static void Add(T obj)
 		{

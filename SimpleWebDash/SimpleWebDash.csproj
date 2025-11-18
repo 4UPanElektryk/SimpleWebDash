@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -24,7 +25,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -70,6 +70,9 @@
   <PropertyGroup>
     <SignManifests>false</SignManifests>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -89,11 +92,14 @@
     <Compile Include="Clock.cs" />
     <Compile Include="Endpoints\CombinedTempertatureDataEndpoint.cs" />
     <Compile Include="Endpoints\CombinedTempertatureEndpointResponseData.cs" />
+    <Compile Include="Endpoints\ConfigurationEndpoint.cs" />
+    <Compile Include="Endpoints\ConfigurationEndpointResponseData.cs" />
     <Compile Include="Endpoints\DataEndpoint.cs" />
     <Compile Include="Endpoints\HttpDataEndpoint.cs" />
     <Compile Include="Endpoints\IpDataEndpoint.cs" />
     <Compile Include="Endpoints\IpDeteailsDataEndpoint.cs" />
     <Compile Include="Endpoints\IpEndpointResponseData.cs" />
+    <Compile Include="Endpoints\SafeMonitorConfig.cs" />
     <Compile Include="Endpoints\TemperatureDataEndpoint.cs" />
     <Compile Include="Endpoints\TemperatureEndpointResponseData.cs" />
     <Compile Include="Monitors\Configuration\MonitorType.cs" />
@@ -124,7 +130,34 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Docs\\*.*">
+    <Content Include="Docs\app.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Docs\app.ts">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Docs\index.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Docs\package-lock.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Docs\package.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Docs\style.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Docs\style.css.map">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Docs\style.scss">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Docs\tsconfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Docs\types.d.ts">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -141,4 +174,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>tsc -b "$(ProjectDir)Docs"</PreBuildEvent>
+  </PropertyGroup>
 </Project>

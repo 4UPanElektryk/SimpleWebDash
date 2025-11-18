@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NetBase.Communication;
+﻿using NetBase.Communication;
+using System;
 
 namespace SimpleWebDash.Endpoints
 {
-    class IpDeteailsDataEndpoint : DataEndpoint
-    {
+	class IpDeteailsDataEndpoint : DataEndpoint
+	{
 		public IpDeteailsDataEndpoint(string url) : base(url) { }
 		public override HttpResponse ReturnData(HttpRequest request)
 		{

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SimpleWebDash.Endpoints;
+using System;
 using System.Collections.Generic;
-using SimpleWebDash.Endpoints;
 
 namespace SimpleWebDash.Monitors.Data
 {

@@ -1,27 +1,32 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Collections.Generic;
-using NetBase;
+﻿using NetBase;
 using NetBase.Communication;
 using NetBase.FileProvider;
+using NetBase.Runtime;
 using NetBase.StaticRouting;
+using Newtonsoft.Json.Linq;
 using SimpleWebDash.Endpoints;
 using SimpleWebDash.Monitors;
-using SimpleWebDash.Monitors.Data;
 using SimpleWebDash.Monitors.Configuration;
-using Newtonsoft.Json.Linq;
+using SimpleWebDash.Monitors.Data;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using NetBase.RuntimeLogger;
 
 namespace SimpleWebDash
 {
 	internal class Program
 	{
 		private static List<DataEndpoint> endpoints;
+		public static Log log;
+		public static MonitorConfig[] monitorConfigs;
 		static void Main(string[] args)
 		{
 			Server server = new Server();
+			Router router = new Router();
+			log = new Log(null);
+			log._prefix = "Program";
 			// replace this mess with a config file if a config file is passed through the command line as an argument
 			// could be a json file or an ini file
 			string IPPath = null;
@@ -30,13 +35,7 @@ namespace SimpleWebDash
 			string IPAddres = null;
 			int Port = 8080;
 			bool IsReadOnlyNode = true;
-			MonitorConfig[] monitorscfg =  new MonitorConfig[]{ 
-				new MonitorConfig()
-				{
-					Type = MonitorType.IP,
-
-				}
-			};
+			MonitorConfig[] monitorscfg = new MonitorConfig[] { };
 			if (args.Length != 1)
 			{
 				Console.Error.WriteLine("Missing Configuration!");
@@ -76,7 +75,7 @@ namespace SimpleWebDash
 					Console.Error.WriteLine("  \"ReadOnlyNode\": true,");
 					Console.Error.WriteLine("  \"Monitors\": ");
 					Console.Error.WriteLine("  [");
-					Console.Error.WriteLine("    { \"Type\": \"IP\", \"Data\": [\"127.0.0.1\"]}");
+					Console.Error.WriteLine("    { \"ID\": \"localhost\", \"FriendlyName\": \"Server Working\" \"Type\": \"IP\", \"Data\": [\"127.0.0.1\"]}");
 					Console.Error.WriteLine("  ]");
 					Console.Error.WriteLine("}");
 #if DEBUG
@@ -85,41 +84,48 @@ namespace SimpleWebDash
 					Environment.Exit(1);
 				}
 			}
-
-			server.HandeRequest = DataRecieved;
+			List<MonitorConfig> configs = monitorscfg.ToList();
+			configs.Sort((a, b) => a.ID.CompareTo(b.ID));
+			monitorscfg = configs.ToArray();
 			Monitor[] monitors = new Monitor[monitorscfg.Length];
 			for (int i = 0; i < monitorscfg.Length; i++)
 			{
-				switch (monitorscfg[i].Type) { 
+				switch (monitorscfg[i].Type)
+				{
 					case MonitorType.IP:
 						monitors[i] = new IpMonitor(monitorscfg[i].Data[0]);
 						break;
-					case MonitorType.TEMPS:
-						monitors[i] = new TemperatureMonitor(monitorscfg[i].Data[0], monitorscfg[i].Data[1]);
+					case MonitorType.GAS:
+						monitors[i] = new TemperatureMonitor(monitorscfg[i].Data[0], monitorscfg[i].ID);
+						//TODO: implement Guest Additions Monitor
 						break;
 					case MonitorType.HTTP:
-						monitors[i] = new HttpMonitor(monitorscfg[i].Data[0], monitorscfg[i].Data[1]);
+						monitors[i] = new HttpMonitor(monitorscfg[i].ID, monitorscfg[i].Data[0]);
 						break;
 					default:
 						Console.Error.WriteLine("Unknown Monitor Type: " + monitorscfg[i].Type);
 						break;
 				}
 			}
+			monitorConfigs = monitorscfg;
 			endpoints = new List<DataEndpoint>{
 				new IpDataEndpoint("api/ipstatus"),
 				new TemperatureDataEndpoint("api/tempstats"),
 				new CombinedTempertatureDataEndpoint("api/fulltempstats"),
 				new HttpDataEndpoint("api/httpstatus"),
+				new ConfigurationEndpoint("api/configuration"),
 			};
 			IFileLoader loader = new LocalFileLoader("Docs\\");
-			Router.Add(loader, "app.js");
-			Router.Add(loader, "index.html", "");
-			Router.Add(loader, "index.html");
-			Router.Add(loader, "style.css");
-			Log.Write("Loading Data");
+			router.Add(loader, "app.js");
+			router.Add(loader, "index.html", "");
+			router.Add(loader, "index.html");
+			router.Add(loader, "style.css");
+			log.Write("Loading Data");
 			ManagerInit(IPPath, HTTPPath, TEMPSPath);
-			Log.Write("Data Loaded");
+			log.Write("Data Loaded");
 			if (!IsReadOnlyNode) { Clock.Start(); }
+			server.HandeRequest = router.OnRequest;
+			router.HandeRequest = DataRecieved;
 			server.Start($"http://{IPAddres}:{Port}/");
 			while (true) { }
 		}
@@ -133,7 +139,8 @@ namespace SimpleWebDash
 		}
 		public static HttpResponse DataRecieved(HttpRequest request)
 		{
-			if (request.Method == HttpMethod.GET) { 
+			if (request.Method == HttpMethod.GET)
+			{
 				return GetRequestRecieved(request);
 			}
 			return new HttpResponse(StatusCode.Method_Not_Allowed);

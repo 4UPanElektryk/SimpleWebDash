@@ -1,42 +1,86 @@
+//#region Type Definitions
 enum DataResponseType {
 	Success,
 	Warning,
 	Error,
 	Loading,
 }
-interface Dictionary<T> {
-	[Key: string]: T;
+enum MonitorType {
+	IP = 0,
+	HTTP = 1,
+	GAS = 2,
 }
-interface ServerDataResponse<T> {
-	Type: DataResponseType,
-	Message: string,
-	Data: T
+class SimpleSensor {
+	name: string;
+	object: HTMLElement;
+	isLoading: boolean = true;
+    UpdateData: (sender: SimpleSensor) => void;
+	SetDisplay(type: DataResponseType, msg: string): void {
+		let icon = this.object.querySelector(`#${this.name}-icon`) as HTMLElement;
+		let text = this.object.querySelector(`#${this.name}-msg`) as HTMLElement;
+		icon?.classList.remove("fa-check", "fa-exclamation-triangle", "fa-times", "fa-refresh", "fa-spin");
+		this.object?.classList.remove("s-ok", "s-warning", "s-error");
+		this.isLoading = false;
+		if (type == DataResponseType.Success) {
+			icon?.classList.add("fa-check");
+			this.object?.classList.add("s-ok");
+		} else if (type == DataResponseType.Warning) {
+			icon?.classList.add("fa-exclamation-triangle");
+			this.object?.classList.add("s-warning");
+		}
+		else if (type == DataResponseType.Error) {
+			icon?.classList.add("fa-times");
+			this.object?.classList.add("s-error");
+		}
+		else {
+			icon?.classList.add("fa-refresh", "fa-spin")
+			this.isLoading = true;
+		}
+		text!.innerText = msg;
+	}
+	PerformUpdate() {
+        this.UpdateData(this);
+	}
+	constructor(name: string, displayText: string, parrent: HTMLElement) {
+		this.name = name;
+        if (parrent.classList.contains("sensor-set")) {
+			this.object = document.getElementById(name);
+			return;
+        }
+		this.object = document.createElement("div");
+		this.object.classList.add("sensor-single");
+		this.object.id = name;
+		this.object.innerHTML = `
+				<span class="big"><i class="fa" aria-hidden="true" id="${name}-icon"></i>${displayText}</span>
+				<span class="small" id="${name}-msg"></span>
+			`;
+        parrent.appendChild(this.object);
+	}
 }
-interface IpEndpointResponseData {
-	Min: number,
-	Max: number,
-	Avg: number,
-	Timeouts: number,
-	Total: number
-}
-interface TemperatureEndpointResponseData {
-	Times: Array<number>,
-	Temps: Array<number>,
-}
-interface CombinedTemperatureEndpointResponseData {
-	Nodes: Dictionary<string>,
-	Temperatures: Dictionary<TemperatureEndpointResponseData>
-}
-
-var LoadingDict: Array<string> = [];
-
+//#endregion
+//#region Global Functions and Types
 const timespan = document.getElementById("period") as HTMLSelectElement;
 timespan.addEventListener("change", () => {
 	location.reload();
 });
+
+let Sensors: Array<SimpleSensor> = [];
+let current: HTMLElement;
+
+function GetSensorGroup(): HTMLElement {
+	if (Sensors.length % 3 == 0) {
+		current = document.createElement("div");
+		current.classList.add("sensor-group");
+		document.getElementById("sensors-container").appendChild(current);
+	}
+	return current;
+}
+
+//Google Charts Setup
 google.charts.load('current', { packages: ['corechart'] });
 google.charts.setOnLoadCallback(SetupAfterGoogleChartsLoad);
 var Temps: google.visualization.DataTable;
+//#endregion
 
 function SensorSimpleSet(obj: string, type: DataResponseType, msg: string,) {
 	let icon = document.getElementById(`${obj}-icon`);
@@ -60,52 +104,10 @@ function SensorSimpleSet(obj: string, type: DataResponseType, msg: string,) {
 	}
 	text!.innerText = msg;
 }
-function CheckIpEndpointAndSet(ip: string, obj: string) {
-	fetch(`/api/ipstatus?ip=${ip}&t=${timespan.value}`).then((x) => x.json()).then((x) => {
-		let res = x as ServerDataResponse<IpEndpointResponseData>;
-		if (LoadingDict.includes(obj)) {
-			delete LoadingDict[LoadingDict.indexOf(obj)];
-		}
-		if (res.Type == DataResponseType.Success) {
-			SensorSimpleSet(obj, res.Type, `Min: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\n`);
-		}
-		else if (res.Type == DataResponseType.Warning) {
-			SensorSimpleSet(obj, res.Type, `${res.Message}\nMin: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\nFail: ${res.Data.Timeouts} / ${res.Data.Total}`);
-		}
-		else {
-			SensorSimpleSet(obj, res.Type, res.Message);
-		}
-	}).catch((x) => {
-		if (!LoadingDict.includes(obj)) {
-			LoadingDict.push(obj);
-		}
-	});
-}
-function CheckHttpEndpointAndSet(id: string, obj: string) {
-	fetch(`/api/httpstatus?id=${id}&t=${timespan.value}`).then((x) => x.json()).then((x) => {
-		let res = x as ServerDataResponse<IpEndpointResponseData>;
-		if (LoadingDict.includes(obj)) {
-			delete LoadingDict[LoadingDict.indexOf(obj)];
-		}
-		if (res.Type == DataResponseType.Success) {
-			SensorSimpleSet(obj, res.Type, `Min: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\n`);
-		}
-		else if (res.Type == DataResponseType.Warning) {
-			SensorSimpleSet(obj, res.Type, `${res.Message}\nMin: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\nFail: ${res.Data.Timeouts} / ${res.Data.Total}`);
-		}
-		else {
-			SensorSimpleSet(obj, res.Type, res.Message);
-		}
-	}).catch((x) => {
-		if (!LoadingDict.includes(obj)) {
-			LoadingDict.push(obj);
-		}
-	});
-}
 function CheckTemperatureEndpointAndSet(id: string) {
 	const jsonData = GetTempsOfAllServers();
 	jsonData.then((jsonData) => {
-		if (jsonData.Type == DataResponseType.Error) {
+		/*if (jsonData.Type == DataResponseType.Error) {
 			if (!LoadingDict.includes(id)) {
 				LoadingDict.push(id);
 			}
@@ -113,7 +115,7 @@ function CheckTemperatureEndpointAndSet(id: string) {
 		}
 		else if (LoadingDict.includes(id)) {
 			delete LoadingDict[LoadingDict.indexOf(id)];
-		}
+		}*/
 		const tempData = jsonData.Data.Temperatures;
 		const nodeNames = jsonData.Data.Nodes;
 		const allTimestamps = new Set<number>();
@@ -163,9 +165,9 @@ function CheckTemperatureEndpointAndSet(id: string) {
 		drawChart();
 		SensorSimpleSet(id, DataResponseType.Success, "");
 	}).catch((x) => {
-		if (!LoadingDict.includes(id)) {
+		/*if (!LoadingDict.includes(id)) {
 			LoadingDict.push(id);
-		}
+		}*/
 	});
 	/*if (LoadingDict.includes(id)) {
 		delete LoadingDict[LoadingDict.indexOf(id)];
@@ -237,22 +239,6 @@ function CheckTemperatureEndpointAndSet(id: string) {
 		}
 	});*/
 }
-async function GetTempsOfServer(host: string): Promise<ServerDataResponse<TemperatureEndpointResponseData>> {
-	try {
-		const response = await fetch(`/api/tempstats?ip=${host}&t=${timespan.value}`, { signal: AbortSignal.timeout(2000) });
-		const times = await response.json() as ServerDataResponse<TemperatureEndpointResponseData>;
-		return times;
-	}
-	catch {
-		return new Promise<ServerDataResponse<TemperatureEndpointResponseData>>((resolve, reject) => {
-			resolve({
-				Type: DataResponseType.Error,
-				Message: "No Response From Server",
-				Data: null
-			} as ServerDataResponse<TemperatureEndpointResponseData>)
-		});
-	}
-}
 async function GetTempsOfAllServers(): Promise<ServerDataResponse<CombinedTemperatureEndpointResponseData>> {
 	try {
 		const response = await fetch(`/api/fulltempstats?t=${timespan.value}`, { signal: AbortSignal.timeout(5000) });
@@ -269,42 +255,12 @@ async function GetTempsOfAllServers(): Promise<ServerDataResponse<CombinedTemper
 		});
 	}
 }
-
-function SubscribeIpEndpoint(ip: string, obj: string) {
-	LoadingDict.push(obj);
-	CheckIpEndpointAndSet(ip, obj);
-	setInterval(() => {
-		CheckIpEndpointAndSet(ip, obj);
-	}, 10000);
-}
 function SubscribeTemperatureEndpoint(obj: string) {
-	LoadingDict.push(obj);
 	CheckTemperatureEndpointAndSet(obj);
 	setInterval(() => {
 		CheckTemperatureEndpointAndSet(obj);
 	}, 30000);
 }
-function SubscribeHttpEndpoint(id: string, obj: string) {
-	LoadingDict.push(obj);
-	CheckHttpEndpointAndSet(id, obj);
-	setInterval(() => {
-		CheckHttpEndpointAndSet(id, obj);
-	}, 10000);
-}
-
-SubscribeIpEndpoint("hole.lan", "PiHole");
-SubscribeIpEndpoint("192.168.10.251", "Printer");
-SubscribeIpEndpoint("192.168.10.252", "TrueNas");
-SubscribeIpEndpoint("192.168.10.149", "VPN");
-SubscribeHttpEndpoint("NVR", "NVR");
-SubscribeHttpEndpoint("NextCloud", "NextCloud");
-SubscribeHttpEndpoint("HomeAssistant", "HomeAssistant");
-SubscribeHttpEndpoint("Ollama", "Ollama");
-SubscribeHttpEndpoint("GitLab", "GitLab");
-SubscribeHttpEndpoint("WebInternal1", "WebInternal1");
-SubscribeHttpEndpoint("DatabaseInternal1", "DatabaseInternal1");
-SubscribeHttpEndpoint("Proxy", "Proxy");
-
 function SetupAfterGoogleChartsLoad() {
 	Temps = new google.visualization.DataTable();
 	SubscribeTemperatureEndpoint("Temperature");
@@ -349,23 +305,99 @@ function drawChart() {
 	const chart = new google.visualization.LineChart(document.getElementById('Temperature-chart'));
 	chart.draw(Temps, options);
 }
+function CreateHttpChecker(id: string) {
+	return function (sender: SimpleSensor) {
+		fetch(`/api/httpstatus?id=${id}&t=${timespan.value}`).then((x) => x.json()).then((x) => {
+			let res = x as ServerDataResponse<IpEndpointResponseData>;
+			if (res.Type == DataResponseType.Success) {
+				sender.SetDisplay(res.Type, `Min: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\n`);
+			}
+			else if (res.Type == DataResponseType.Warning) {
+				sender.SetDisplay(res.Type, `${res.Message}\nMin: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\nFail: ${res.Data.Timeouts} / ${res.Data.Total}`);
+			}
+			else {
+				sender.SetDisplay(res.Type, res.Message);
+			}
+		}).catch((x) => {
+            sender.isLoading = true;
+		});
+	}
+}
+function CreateIpChecker(ip: string) {
+	return function (sender: SimpleSensor) {
+		fetch(`/api/ipstatus?id=${ip}&t=${timespan.value}`).then((x) => x.json()).then((x) => {
+			let res = x as ServerDataResponse<IpEndpointResponseData>;
+			if (res.Type == DataResponseType.Success) {
+				sender.SetDisplay(res.Type, `Min: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\n`);
+			}
+			else if (res.Type == DataResponseType.Warning) {
+				sender.SetDisplay(res.Type, `${res.Message}\nMin: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\nFail: ${res.Data.Timeouts} / ${res.Data.Total}`);
+			}
+			else {
+				sender.SetDisplay(res.Type, res.Message);
+			}
+		}).catch((x) => {
+			sender.isLoading = true;
+		});
+	}
+}
+
+function FetchConfiguration(setupFinished: Function) {
+	fetch(`/api/configuration`).then((x) => x.json()).then((x) => {
+		let res = x as ServerDataResponse<ConfigurationEndpointResponseData>;
+		res.Data.Configuration.forEach((element) => {
+			console.log(`Setting up sensor: ${element.FriendlyName} of type ${MonitorType[element.Type]} with ID: ${element.ID}`);
+			if (element.Type == MonitorType.HTTP) {
+				let httpSensor = new SimpleSensor(element.ID, element.FriendlyName, GetSensorGroup());
+				httpSensor.UpdateData = CreateHttpChecker(element.ID);
+				Sensors.push(httpSensor);
+				console.log(`HTTP Sensor for ${element.FriendlyName} set up.`);
+			}
+			else if (element.Type == MonitorType.IP) {
+				let ipSensor = new SimpleSensor(element.ID, element.FriendlyName, GetSensorGroup());
+				ipSensor.UpdateData = CreateIpChecker(element.ID);
+				Sensors.push(ipSensor);
+                console.log(`IP Sensor for ${element.FriendlyName} set up.`);
+			}
+		});
+        console.log("Configuration fetched and sensors set up.");
+        setupFinished();
+	}).catch((x) => {
+		console.error("Failed to fetch configuration!\nMajor shit happend!\nHeads will Roll!");
+		console.error(x);
+		debugger;
+		//window.location.reload();
+	});
+}
+
+function SetupAfterConfigurationRetrieved() {
+	Sensors.forEach((sensor) => {
+		sensor.PerformUpdate();
+	});
+	setInterval(() => {
+		Sensors.forEach((sensor) => {
+			sensor.PerformUpdate();
+		});
+	}, 10000);
+}
+FetchConfiguration(SetupAfterConfigurationRetrieved)
 let cycle = 0;
 setInterval(() => {
+	let str = "";
 	if (cycle == 0) {
-		LoadingDict.forEach(element => {
-			SensorSimpleSet(element, DataResponseType.Loading, "Loading.");
-		});
+		str = "Loading.";
 	}
 	else if (cycle == 1) {
-		LoadingDict.forEach(element => {
-			SensorSimpleSet(element, DataResponseType.Loading, "Loading..");
-		});
+		str = "Loading..";
 	}
 	else if (cycle == 2) {
-		LoadingDict.forEach(element => {
-			SensorSimpleSet(element, DataResponseType.Loading, "Loading...");
-		});
+        str = "Loading...";
 	}
+	Sensors.forEach(element => {
+		if (element.isLoading) {
+			element.SetDisplay(DataResponseType.Loading, str);
+		}
+	});
 	cycle++;
 	cycle = cycle % 3;
 }, 500);

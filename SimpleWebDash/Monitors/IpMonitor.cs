@@ -1,6 +1,6 @@
-﻿using System.Net.NetworkInformation;
+﻿using SimpleWebDash.Monitors.Data;
+using System.Net.NetworkInformation;
 using System.Text;
-using SimpleWebDash.Monitors.Data;
 
 namespace SimpleWebDash.Monitors
 {
@@ -18,7 +18,7 @@ namespace SimpleWebDash.Monitors
 			string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 			byte[] buffer = Encoding.ASCII.GetBytes(data);
 			PingReply reply = pingSender.Send(_ip, timeout, buffer, options);
-			if(reply.Status != IPStatus.Success)
+			if (reply.Status != IPStatus.Success)
 			{
 				timeout = 250;
 				reply = pingSender.Send(_ip, timeout, buffer, options);

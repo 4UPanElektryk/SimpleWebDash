@@ -1,26 +1,24 @@
 ﻿using NetBase.Communication;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SimpleWebDash.Monitors.Data;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SimpleWebDash.Endpoints
 {
-    public class CombinedTempertatureDataEndpoint : DataEndpoint
-    {
-        public CombinedTempertatureDataEndpoint(string url) : base(url) { }
+	public class CombinedTempertatureDataEndpoint : DataEndpoint
+	{
+		public CombinedTempertatureDataEndpoint(string url) : base(url) { }
 		public override HttpResponse ReturnData(HttpRequest request)
 		{
 			string tspan = request.URLParamenters["t"]; // "0000d00h00m";
 			int days = int.Parse(tspan.Split('d')[0]);
 			int hours = int.Parse(tspan.Split('d')[1].Split('h')[0]);
 			int minutes = int.Parse(tspan.Split('d')[1].Split('h')[1].TrimEnd('m'));
-			
+
 
 
 			TimeSpan span = new TimeSpan(days, hours, minutes, 0);
