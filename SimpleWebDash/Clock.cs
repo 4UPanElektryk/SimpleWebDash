@@ -23,7 +23,7 @@ namespace SimpleWebDash
 		private static void AutoSaveEvent(object sender, ElapsedEventArgs e)
 		{
 			IpMonitorDataManager.Save();
-			TemperatureMonitorDataManager.Save();
+			HttpMonitorDataManager.Save();
 			TemperatureMonitorDataManager.Save();
 		}
 		public static void Stop()

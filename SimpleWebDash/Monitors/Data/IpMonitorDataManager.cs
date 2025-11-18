@@ -13,6 +13,7 @@ namespace SimpleWebDash.Monitors.Data
 			//Console.WriteLine(allforip.Count);
 			List<IpMonitorData> allinagiventimespan = allforip.FindAll((x) => x.Time > date);
 			//Console.WriteLine(allinagiventimespan.Count);
+			allinagiventimespan.AddRange(Temp);
 			return allinagiventimespan.ToArray();
 		}
 		public static IpEndpointResponseData GetResponseData(DateTime date, string IP)
