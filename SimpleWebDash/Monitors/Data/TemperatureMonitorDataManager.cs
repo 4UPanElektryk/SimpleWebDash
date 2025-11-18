@@ -14,9 +14,9 @@ namespace SimpleWebDash.Monitors.Data
 		{
 			//Console.WriteLine(data.Count);
 			List<TemperatureMonitorData> allforip = Saved.FindAll((x) => x.IP == IP);
+			allforip.AddRange(Temp.FindAll((x) => x.IP == IP));
 			//Console.WriteLine(allforip.Count);
 			List<TemperatureMonitorData> allinagiventimespan = allforip.FindAll((x) => x.Time > date);
-			allinagiventimespan.AddRange(Temp);
 			//Console.WriteLine(allinagiventimespan.Count);
 			List<TemperatureMonitorData> Final = new List<TemperatureMonitorData>();
 			int evrynth = allinagiventimespan.Count / MAX_ALLOWED_DATA_IN_RESPONSE;

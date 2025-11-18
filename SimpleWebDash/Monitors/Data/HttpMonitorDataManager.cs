@@ -10,6 +10,7 @@ namespace SimpleWebDash.Monitors.Data
 		{
 			//Console.WriteLine(data.Count);
 			List<HttpMonitorData> allforip = Saved.FindAll((x) => x.ID == ID);
+			allforip.AddRange(Temp.FindAll((x) => x.ID == ID));
 			//Console.WriteLine(allforip.Count);
 			List<HttpMonitorData> allinagiventimespan = allforip.FindAll((x) => x.Time > date);
 			//Console.WriteLine(allinagiventimespan.Count);
