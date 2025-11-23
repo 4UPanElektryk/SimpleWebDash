@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using SimpleWebDash.Monitors.Data;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SimpleWebDash.Endpoints
@@ -35,7 +36,10 @@ namespace SimpleWebDash.Endpoints
 				Data = new TemperatureEndpointResponseData()
 				{
 					Times = values.ToArray(),
-					Temps = temps.ToArray()
+					Temps = temps.ToArray(),
+					Avg = temps.Count > 0 ? (int)temps.Average() : 0,
+					Max = temps.Count > 0 ? temps.Max() : 0,
+					Min = temps.Count > 0 ? temps.Min() : 0
 				}
 			};
 			HttpResponse response = new HttpResponse(StatusCode.OK, JsonConvert.SerializeObject(response1), null, Encoding.UTF8, ContentType.application_json);

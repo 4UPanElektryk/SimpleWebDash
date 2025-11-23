@@ -85,8 +85,8 @@ namespace SimpleWebDash
 				}
 			}
 			List<MonitorConfig> configs = monitorscfg.ToList();
-			configs.Sort((a, b) => a.ID.CompareTo(b.ID));
 			monitorscfg = configs.ToArray();
+			configs.Sort((a, b) => a.ID.CompareTo(b.ID));
 			Monitor[] monitors = new Monitor[monitorscfg.Length];
 			for (int i = 0; i < monitorscfg.Length; i++)
 			{
@@ -107,6 +107,7 @@ namespace SimpleWebDash
 						break;
 				}
 			}
+			monitorscfg = configs.ToArray();
 			monitorConfigs = monitorscfg;
 			endpoints = new List<DataEndpoint>{
 				new IpDataEndpoint("api/ipstatus"),

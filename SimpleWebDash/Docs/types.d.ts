@@ -19,6 +19,9 @@ interface IpEndpointResponseData {
 interface TemperatureEndpointResponseData {
 	Times: Array<number>,
 	Temps: Array<number>,
+	Min: number,
+	Max: number,
+    Avg: number
 }
 
 interface CombinedTemperatureEndpointResponseData {

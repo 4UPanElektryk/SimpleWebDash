@@ -68,7 +68,10 @@ namespace SimpleWebDash.Endpoints
 				allDataResult.Add(node.Key, new TemperatureEndpointResponseData()
 				{
 					Times = values.ToArray(),
-					Temps = temps.ToArray()
+					Temps = temps.ToArray(),
+					Max = temps.Count > 0 ? temps.Max() : 0,
+					Min = temps.Count > 0 ? temps.Min() : 0,
+					Avg = temps.Count > 0 ? (int)temps.Average() : 0,
 				});
 			}
 			return allDataResult;
