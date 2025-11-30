@@ -87,20 +87,20 @@ namespace SimpleWebDash
 			List<MonitorConfig> configs = monitorscfg.ToList();
 			monitorscfg = configs.ToArray();
 			configs.Sort((a, b) => a.ID.CompareTo(b.ID));
-			Monitor[] monitors = new Monitor[monitorscfg.Length];
+			List<Monitor> monitors = new List<Monitor>();
 			for (int i = 0; i < monitorscfg.Length; i++)
 			{
 				switch (monitorscfg[i].Type)
 				{
 					case MonitorType.IP:
-						monitors[i] = new IpMonitor(monitorscfg[i].Data[0]);
+						monitors.Add(new IpMonitor(monitorscfg[i].Data[0]));
 						break;
 					case MonitorType.GAS:
-						monitors[i] = new TemperatureMonitor(monitorscfg[i].Data[0], monitorscfg[i].ID);
-						//TODO: implement Guest Additions Monitor
+						monitors.Add(new TemperatureMonitor(monitorscfg[i].Data[0], monitorscfg[i].ID));
+						monitors.Add(new MemoryMonitor(monitorscfg[i].Data[0], monitorscfg[i].ID));
 						break;
 					case MonitorType.HTTP:
-						monitors[i] = new HttpMonitor(monitorscfg[i].ID, monitorscfg[i].Data[0]);
+						monitors.Add(new HttpMonitor(monitorscfg[i].ID, monitorscfg[i].Data[0]));
 						break;
 					default:
 						Console.Error.WriteLine("Unknown Monitor Type: " + monitorscfg[i].Type);

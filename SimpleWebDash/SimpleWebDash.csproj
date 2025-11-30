@@ -105,12 +105,15 @@
     <Compile Include="Monitors\Configuration\MonitorType.cs" />
     <Compile Include="Monitors\Data\HttpMonitorData.cs" />
     <Compile Include="Monitors\Data\HttpMonitorDataManager.cs" />
+    <Compile Include="Monitors\Data\MemoryMonitorData.cs" />
+    <Compile Include="Monitors\Data\MemoryMonitorDataManager.cs" />
     <Compile Include="Monitors\HttpMonitor.cs" />
     <Compile Include="Monitors\Data\TemperatureMonitorData.cs" />
     <Compile Include="Monitors\Data\TemperatureMonitorDataManager.cs" />
     <Compile Include="Monitors\IpMonitor.cs" />
     <Compile Include="Monitors\Data\IpMonitorData.cs" />
     <Compile Include="Monitors\Data\IpMonitorDataManager.cs" />
+    <Compile Include="Monitors\MemoryMonitor.cs" />
     <Compile Include="Monitors\Monitor.cs" />
     <Compile Include="Monitors\Configuration\MonitorConfig.cs" />
     <Compile Include="Monitors\TemperatureMonitor.cs" />
