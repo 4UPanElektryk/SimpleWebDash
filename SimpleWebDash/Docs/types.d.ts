@@ -29,6 +29,19 @@ interface CombinedTemperatureEndpointResponseData {
 	Temperatures: Dictionary<TemperatureEndpointResponseData>
 }
 
+interface MemoryEndpointResponseData {
+	Times: Array<number>;
+	total_kb: Array<number>;
+	used_kb: Array<number>;
+	Avg: number;
+	Max: number;
+	Min: number;
+}
+
+interface CombinedMemoryEndpointResponseData {
+	MemoryData: Dictionary<MemoryEndpointResponseData>
+}
+
 interface MonitorConfig {
 	ID: string,
 	FriendlyName: string,

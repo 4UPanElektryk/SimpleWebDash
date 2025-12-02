@@ -25,6 +25,7 @@ namespace SimpleWebDash
 			IpMonitorDataManager.Save();
 			HttpMonitorDataManager.Save();
 			TemperatureMonitorDataManager.Save();
+			MemoryMonitorDataManager.Save();
 		}
 		public static void Stop()
 		{

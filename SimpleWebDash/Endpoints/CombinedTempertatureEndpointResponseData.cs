@@ -6,6 +6,5 @@ namespace SimpleWebDash.Endpoints
 	{
 		public Dictionary<string, string> Nodes { get; set; }
 		public Dictionary<string, TemperatureEndpointResponseData> Temperatures { get; set; }
-
 	}
 }

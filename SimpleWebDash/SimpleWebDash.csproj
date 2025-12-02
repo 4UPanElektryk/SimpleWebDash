@@ -90,6 +90,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clock.cs" />
+    <Compile Include="Endpoints\CombinedMemoryDataEndpoint.cs" />
+    <Compile Include="Endpoints\CombinedMemoryEndpointResponseData.cs" />
     <Compile Include="Endpoints\CombinedTempertatureDataEndpoint.cs" />
     <Compile Include="Endpoints\CombinedTempertatureEndpointResponseData.cs" />
     <Compile Include="Endpoints\ConfigurationEndpoint.cs" />
@@ -99,6 +101,7 @@
     <Compile Include="Endpoints\IpDataEndpoint.cs" />
     <Compile Include="Endpoints\IpDeteailsDataEndpoint.cs" />
     <Compile Include="Endpoints\IpEndpointResponseData.cs" />
+    <Compile Include="Endpoints\MemoryEndpointResponseData.cs" />
     <Compile Include="Endpoints\SafeMonitorConfig.cs" />
     <Compile Include="Endpoints\TemperatureDataEndpoint.cs" />
     <Compile Include="Endpoints\TemperatureEndpointResponseData.cs" />

@@ -32,6 +32,7 @@ namespace SimpleWebDash
 			string IPPath = null;
 			string HTTPPath = null;
 			string TEMPSPath = null;
+			string MemoryPath = null;
 			string IPAddres = null;
 			int Port = 8080;
 			bool IsReadOnlyNode = true;
@@ -55,6 +56,7 @@ namespace SimpleWebDash
 					IPPath = config["IPMonitorDataPath"].Value;
 					HTTPPath = config["HTTPMonitorDataPath"].Value;
 					TEMPSPath = config["TEMPSMonitorDataPath"].Value;
+					MemoryPath = config["MememoryMonitorDataPath"].Value;
 					IPAddres = config["IPAddress"].Value;
 					Port = (int)config["Port"].Value;
 					IsReadOnlyNode = config["ReadOnlyNode"].Value;
@@ -70,6 +72,7 @@ namespace SimpleWebDash
 					Console.Error.WriteLine("  \"IPMonitorDataPath\": \"ips.jsonl\",");
 					Console.Error.WriteLine("  \"HTTPMonitorDataPath\": \"https.jsonl\",");
 					Console.Error.WriteLine("  \"TEMPSMonitorDataPath\": \"temps.jsonl\",");
+					Console.Error.WriteLine("  \"MememoryMonitorDataPath\": \"mems.jsonl\",");
 					Console.Error.WriteLine("  \"IPAddress\": \"127.0.0.1\",");
 					Console.Error.WriteLine("  \"Port\": 8080,");
 					Console.Error.WriteLine("  \"ReadOnlyNode\": true,");
@@ -113,6 +116,7 @@ namespace SimpleWebDash
 				new IpDataEndpoint("api/ipstatus"),
 				new TemperatureDataEndpoint("api/tempstats"),
 				new CombinedTempertatureDataEndpoint("api/fulltempstats"),
+				new CombinedMemoryDataEndpoint("api/fullmemstats"),
 				new HttpDataEndpoint("api/httpstatus"),
 				new ConfigurationEndpoint("api/configuration"),
 			};
@@ -122,7 +126,7 @@ namespace SimpleWebDash
 			router.Add(loader, "index.html");
 			router.Add(loader, "style.css");
 			log.Write("Loading Data");
-			ManagerInit(IPPath, HTTPPath, TEMPSPath);
+			ManagerInit(IPPath, HTTPPath, TEMPSPath, MemoryPath);
 			log.Write("Data Loaded");
 			if (!IsReadOnlyNode) { Clock.Start(); }
 			server.HandeRequest = router.OnRequest;
@@ -130,12 +134,13 @@ namespace SimpleWebDash
 			server.Start($"http://{IPAddres}:{Port}/");
 			while (true) { }
 		}
-		private async static void ManagerInit(string ipmgrPath, string httpmgrPath, string tempmgrPath)
+		private async static void ManagerInit(string ipmgrPath, string httpmgrPath, string tempmgrPath, string memoryPath)
 		{
 			await Task.WhenAll(
 				IpMonitorDataManager.Initialize(ipmgrPath),
 				HttpMonitorDataManager.Initialize(httpmgrPath),
-				TemperatureMonitorDataManager.Initialize(tempmgrPath)
+				TemperatureMonitorDataManager.Initialize(tempmgrPath),
+				MemoryMonitorDataManager.Initialize(memoryPath)
 			);
 		}
 		public static HttpResponse DataRecieved(HttpRequest request)

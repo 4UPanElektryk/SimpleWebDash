@@ -1,18 +1,13 @@
 ﻿using Newtonsoft.Json;
 using SimpleWebDash.Monitors.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleWebDash.Monitors
 {
 	public class MemoryMonitor : Monitor
 	{
 		private string _ip;
-		public MemoryMonitor(string IpAddress, string NodeName) : base() { }
+		public MemoryMonitor(string IpAddress, string NodeName) : base() { _ip = IpAddress; MemoryMonitorDataManager.Nodes.Add(IpAddress, NodeName); }
 		public override void OnEvent(object sender, ClockTickEventArgs e)
 		{
 			HttpClient client = new HttpClient();
