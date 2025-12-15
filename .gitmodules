@@ -1,0 +1,3 @@
+[submodule "libs/NetBase"]
+	path = libs/NetBase
+	url = https://github.com/4UPanElektryk/NetBase.git
