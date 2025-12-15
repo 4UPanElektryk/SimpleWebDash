@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleWebDash", "SimpleWebDash\SimpleWebDash.csproj", "{7424DDEE-6C5F-4261-95DD-C6681D961EA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetBase", "..\NetBase\NetBase\NetBase.csproj", "{539351DF-FF15-4CF7-866D-3E1628339811}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetBase", "libs\NetBase\NetBase\NetBase.csproj", "{539351DF-FF15-4CF7-866D-3E1628339811}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
