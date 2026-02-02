@@ -9,6 +9,7 @@ ARCH="amd64"              # change to arm64 if needed
 APP_USER="nhts"
 APP_DIR="/opt/${APP_NAME}"
 BIN_PATH="${APP_DIR}/${APP_NAME}"
+ENV_FILE="/etc/${APP_NAME}.env"
 SERVICE_FILE="/etc/systemd/system/${APP_NAME}.service"
 ### ================== ###
 
