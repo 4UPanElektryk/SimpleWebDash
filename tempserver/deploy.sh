@@ -3,6 +3,7 @@ set -euo pipefail
 
 ### ==== CONFIG ==== ###
 APP_NAME="nhts"
+FULL_APP_NAME="Node Health & Telemetry Server"
 GITHUB_REPO="4UPanElektryk/SimpleWebDash"   # ← e.g. janek/myapp
 ARCH="amd64"              # change to arm64 if needed
 APP_USER="nhts"
@@ -63,7 +64,7 @@ if [[ ! -f "${SERVICE_FILE}" ]]; then
 
   cat > "${SERVICE_FILE}" <<EOF
 [Unit]
-Description=${APP_NAME} service
+Description=${FULL_APP_NAME} service
 After=network.target pve-cluster.service
 Wants=network.target
 
