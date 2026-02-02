@@ -1,33 +1,34 @@
-// Node Health & Telemetry Server
+// Node Health & Telemetry Service
 package main
 
 import (
 	"bufio"
-	"encoding/json"		// JSON for responses
-	"flag"				// for the info flag
-	"fmt"				// Printing
-	"net/http"			// http server
-	"os"				// File readinf
-	"strconv"			// str to int
-	"strings"			// String Modification
+	"encoding/json" // JSON for responses
+	"flag"          // for the info flag
+	"fmt"           // Printing
+	"log"           // Logging
+	"net/http"      // http server
+	"os"            // File readinf
+	"strconv"       // str to int
+	"strings"       // String Modification
 )
 
-const versionstr = "1.0.0"
+const versionstr = "1.0.1"
 
 type MemInfo struct {
 	TotalKB uint64 `json:"total_kb"`
-	FreeKB uint64 `json:"free_kb"`
+	FreeKB  uint64 `json:"free_kb"`
 }
 
 func GetTemps() []int {
-	AllTemperatures :=[]int{}
-	files, err := os.ReadDir("/sys/class/thermal/");
+	AllTemperatures := []int{}
+	files, err := os.ReadDir("/sys/class/thermal/")
 	if err != nil {
 		panic(err)
 	}
 	for i := 0; i < len(files); i++ {
 		filename := files[i].Name()
-		if(strings.HasPrefix(filename, "thermal_zone")){
+		if strings.HasPrefix(filename, "thermal_zone") {
 			data, err := os.ReadFile("/sys/class/thermal/" + filename + "/temp")
 			if err != nil {
 				panic(err)
@@ -37,9 +38,9 @@ func GetTemps() []int {
 				panic(err)
 			}
 			temperature = temperature / 1000
-			AllTemperatures = append(AllTemperatures, temperature);
+			AllTemperatures = append(AllTemperatures, temperature)
 		}
-		
+
 	}
 	return AllTemperatures
 }
@@ -71,7 +72,7 @@ func GetMemory() MemInfo {
 
 func ApiTemperature(w http.ResponseWriter, req *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
-	arr := GetTemps();
+	arr := GetTemps()
 	jsonBytes, err := json.Marshal(arr)
 	if err != nil {
 		panic(err)
@@ -82,7 +83,7 @@ func ApiTemperature(w http.ResponseWriter, req *http.Request) {
 func ApiMemory(w http.ResponseWriter, req *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	var data MemInfo
-	data = GetMemory();
+	data = GetMemory()
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
 		panic(err)
@@ -94,11 +95,15 @@ func main() {
 	version := flag.Bool("v", false, "shows version of the software")
 	flag.Parse()
 	if *version {
-		fmt.Println("Node Health & Telemetry Server version " + versionstr)
-		return;
+		fmt.Println("Node Health & Telemetry Service version " + versionstr)
+		return
 	}
 	http.HandleFunc("/api/temperatures", ApiTemperature)
 	http.HandleFunc("/api/memory", ApiMemory)
-	http.ListenAndServe(":" + os.Getenv("PORT"), nil)
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("PORT environment variable not set")
+	} else {
+		http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	}
 }
-

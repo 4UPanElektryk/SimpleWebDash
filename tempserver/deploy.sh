@@ -26,7 +26,7 @@ if ! command -v curl >/dev/null; then
 fi
 
 # --- detect latest release ---
-echo "[ INFO ] Fetching latest release INFO"
+echo "[ INFO ] Fetching latest release info"
 LATEST_URL=$(curl -fsSL \
   "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" \
   | grep browser_download_url \
@@ -58,6 +58,20 @@ curl -fsSL "${LATEST_URL}" -o "${BIN_PATH}"
 chmod 755 "${BIN_PATH}"
 chown -R "${APP_USER}:${APP_USER}" "${APP_DIR}"
 
+# --- create env file (only once) ---
+if [[ ! -f "${ENV_FILE}" ]]; then
+  echo "[ INFO ] Creating ${ENV_FILE}"
+  cat > "${ENV_FILE}" <<EOF
+# ${APP_NAME} configuration
+PORT=3000
+EOF
+
+  chown root:root "${ENV_FILE}"
+  chmod 600 "${ENV_FILE}"
+else
+  echo "[ INFO ] ${ENV_FILE} already exists (keeping current values)"
+fi
+
 # --- create systemd service ---
 if [[ ! -f "${SERVICE_FILE}" ]]; then
   echo "[ INFO ] Writing systemd service"
@@ -78,8 +92,7 @@ ExecStart=${BIN_PATH}
 Restart=on-failure
 RestartSec=5s
 
-# Optional env file
-# EnvironmentFile=/etc/${APP_NAME}.env
+EnvironmentFile=/etc/${APP_NAME}.env
 
 StandardOutput=journal
 StandardError=journal
