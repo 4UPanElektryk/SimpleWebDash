@@ -1,6 +1,6 @@
 ﻿namespace SimpleWebDash.Endpoints
 {
-	public struct IpEndpointResponseData
+	public struct IpResponse
 	{
 		public long Min;
 		public long Max;

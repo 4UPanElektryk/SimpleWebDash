@@ -113,12 +113,13 @@ namespace SimpleWebDash
 			monitorscfg = configs.ToArray();
 			monitorConfigs = monitorscfg;
 			endpoints = new List<DataEndpoint>{
-				new IpDataEndpoint("api/ipstatus"),
-				new TemperatureDataEndpoint("api/tempstats"),
-				new CombinedTempertatureDataEndpoint("api/fulltempstats"),
-				new CombinedMemoryDataEndpoint("api/fullmemstats"),
-				new HttpDataEndpoint("api/httpstatus"),
-				new ConfigurationEndpoint("api/configuration"),
+				new IpE("api/ipstatus"),
+				new IpDeteailsE("api/ipdetails"),
+				new TemperatureE("api/tempstats"),
+				new CombinedTempertatureE("api/fulltempstats"),
+				new CombinedMemoryE("api/fullmemstats"),
+				new HttpE("api/httpstatus"),
+				new ConfigurationE("api/configuration"),
 			};
 			IFileLoader loader = new LocalFileLoader("Docs\\");
 			router.Add(loader, "app.js");

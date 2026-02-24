@@ -6,9 +6,9 @@ using System.Text;
 
 namespace SimpleWebDash.Endpoints
 {
-	public class HttpDataEndpoint : DataEndpoint
+	public class HttpE : DataEndpoint
 	{
-		public HttpDataEndpoint(string url) : base(url) { }
+		public HttpE(string url) : base(url) { }
 		public override HttpResponse ReturnData(HttpRequest request)
 		{
 			int slowNetResponseTime = 300;
@@ -19,7 +19,7 @@ namespace SimpleWebDash.Endpoints
 			int minutes = int.Parse(tspan.Split('d')[1].Split('h')[1].TrimEnd('m'));
 			TimeSpan span = new TimeSpan(days, hours, minutes, 0);
 			DateTime start = DateTime.UtcNow - span;
-			IpEndpointResponseData responseData = HttpMonitorDataManager.GetResponseData(start, request.URLParamenters["id"]);
+			IpResponse responseData = HttpMonitorDataManager.GetResponseData(start, request.URLParamenters["id"]);
 
 			string message = "OK";
 			DataResponseType responseType = DataResponseType.Success;
@@ -41,7 +41,7 @@ namespace SimpleWebDash.Endpoints
 					}
 				}
 			}
-			ServerDataResponse<IpEndpointResponseData> response1 = new ServerDataResponse<IpEndpointResponseData>()
+			ServerDataResponse<IpResponse> response1 = new ServerDataResponse<IpResponse>()
 			{
 				Type = responseType,
 				Message = message,

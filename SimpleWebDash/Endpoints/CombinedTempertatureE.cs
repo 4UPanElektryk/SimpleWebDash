@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace SimpleWebDash.Endpoints
 {
-	public class CombinedTempertatureDataEndpoint : DataEndpoint
+	public class CombinedTempertatureE : DataEndpoint
 	{
-		public CombinedTempertatureDataEndpoint(string url) : base(url) { }
+		public CombinedTempertatureE(string url) : base(url) { }
 		public override HttpResponse ReturnData(HttpRequest request)
 		{
 			string tspan = request.URLParamenters["t"]; // "0000d00h00m";
@@ -24,15 +24,15 @@ namespace SimpleWebDash.Endpoints
 			TimeSpan span = new TimeSpan(days, hours, minutes, 0);
 			DateTime start = DateTime.UtcNow - span;
 
-			Dictionary<string, TemperatureEndpointResponseData> allData = GetAllData(start).Result;
+			Dictionary<string, TemperatureResponse> allData = GetAllData(start).Result;
 
 			string message = "OK";
 			DataResponseType responseType = DataResponseType.Success;
-			ServerDataResponse<CombinedTempertatureEndpointResponseData> response1 = new ServerDataResponse<CombinedTempertatureEndpointResponseData>()
+			ServerDataResponse<CombinedTempertatureResponse> response1 = new ServerDataResponse<CombinedTempertatureResponse>()
 			{
 				Type = responseType,
 				Message = message,
-				Data = new CombinedTempertatureEndpointResponseData()
+				Data = new CombinedTempertatureResponse()
 				{
 					Nodes = TemperatureMonitorDataManager.Nodes,
 					Temperatures = allData,
@@ -46,7 +46,7 @@ namespace SimpleWebDash.Endpoints
 		/// returns all the data for all the nodes
 		/// string = ip, value = node temp data
 		/// </summary>
-		private async Task<Dictionary<string, TemperatureEndpointResponseData>> GetAllData(DateTime start)
+		private async Task<Dictionary<string, TemperatureResponse>> GetAllData(DateTime start)
 		{
 			Dictionary<string, Task<TemperatureMonitorData[]>> allData = new Dictionary<string, Task<TemperatureMonitorData[]>>();
 			foreach (var node in TemperatureMonitorDataManager.Nodes)
@@ -55,7 +55,7 @@ namespace SimpleWebDash.Endpoints
 				allData.Add(node.Key, datas);
 			}
 			Task.WaitAll(allData.Values.ToArray());
-			Dictionary<string, TemperatureEndpointResponseData> allDataResult = new Dictionary<string, TemperatureEndpointResponseData>();
+			Dictionary<string, TemperatureResponse> allDataResult = new Dictionary<string, TemperatureResponse>();
 			foreach (var node in allData)
 			{
 				List<long> values = new List<long>();
@@ -65,7 +65,7 @@ namespace SimpleWebDash.Endpoints
 					values.Add(((DateTimeOffset)data.Time).ToUnixTimeSeconds());
 					temps.Add(data.Temperature);
 				}
-				allDataResult.Add(node.Key, new TemperatureEndpointResponseData()
+				allDataResult.Add(node.Key, new TemperatureResponse()
 				{
 					Times = values.ToArray(),
 					Temps = temps.ToArray(),

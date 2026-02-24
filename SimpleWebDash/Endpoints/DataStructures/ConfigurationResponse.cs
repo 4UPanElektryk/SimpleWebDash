@@ -1,6 +1,6 @@
 ﻿namespace SimpleWebDash.Endpoints
 {
-	public struct ConfigurationEndpointResponseData
+	public struct ConfigurationResponse
 	{
 		public SafeMonitorConfig[] Configuration;
 	}

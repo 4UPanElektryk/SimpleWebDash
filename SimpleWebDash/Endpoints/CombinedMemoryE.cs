@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace SimpleWebDash.Endpoints
 {
-	public class CombinedMemoryDataEndpoint : DataEndpoint
+	public class CombinedMemoryE : DataEndpoint
 	{
-		public CombinedMemoryDataEndpoint(string url) : base(url) { }
+		public CombinedMemoryE(string url) : base(url) { }
 
 		public override HttpResponse ReturnData(HttpRequest request)
 		{
@@ -20,20 +20,18 @@ namespace SimpleWebDash.Endpoints
 			int hours = int.Parse(tspan.Split('d')[1].Split('h')[0]);
 			int minutes = int.Parse(tspan.Split('d')[1].Split('h')[1].TrimEnd('m'));
 
-
-
 			TimeSpan span = new TimeSpan(days, hours, minutes, 0);
 			DateTime start = DateTime.UtcNow - span;
 
-			Dictionary<string, MemoryEndpointResponseData> allData = GetAllData(start).Result;
+			Dictionary<string, MemoryResponse> allData = GetAllData(start).Result;
 
 			string message = "OK";
 			DataResponseType responseType = DataResponseType.Success;
-			ServerDataResponse<CombinedMemoryEndpointResponseData> response1 = new ServerDataResponse<CombinedMemoryEndpointResponseData>()
+			ServerDataResponse<CombinedMemoryResponse> response1 = new ServerDataResponse<CombinedMemoryResponse>()
 			{
 				Type = responseType,
 				Message = message,
-				Data = new CombinedMemoryEndpointResponseData()
+				Data = new CombinedMemoryResponse()
 				{
 					MemoryData = allData,
 				}
@@ -46,7 +44,7 @@ namespace SimpleWebDash.Endpoints
 		/// returns all the data for all the nodes
 		/// string = ip, value = node temp data
 		/// </summary>
-		private async Task<Dictionary<string, MemoryEndpointResponseData>> GetAllData(DateTime start)
+		private async Task<Dictionary<string, MemoryResponse>> GetAllData(DateTime start)
 		{
 			Dictionary<string, Task<MemoryMonitorData[]>> allData = new Dictionary<string, Task<MemoryMonitorData[]>>();
 			foreach (var node in TemperatureMonitorDataManager.Nodes)
@@ -55,7 +53,7 @@ namespace SimpleWebDash.Endpoints
 				allData.Add(node.Value, datas);
 			}
 			Task.WaitAll(allData.Values.ToArray());
-			Dictionary<string, MemoryEndpointResponseData> allDataResult = new Dictionary<string, MemoryEndpointResponseData>();
+			Dictionary<string, MemoryResponse> allDataResult = new Dictionary<string, MemoryResponse>();
 			foreach (var node in allData)
 			{
 				List<long> timestamps = new List<long>();
@@ -67,7 +65,7 @@ namespace SimpleWebDash.Endpoints
 					totalkbs.Add(data.total_kb);
 					usedkbs.Add(data.total_kb - data.free_kb);
 				}
-				allDataResult.Add(node.Key, new MemoryEndpointResponseData()
+				allDataResult.Add(node.Key, new MemoryResponse()
 				{
 					Times = timestamps.ToArray(),
 					total_kb = totalkbs.ToArray(),

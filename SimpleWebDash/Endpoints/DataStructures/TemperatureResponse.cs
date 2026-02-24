@@ -1,6 +1,6 @@
 ﻿namespace SimpleWebDash.Endpoints
 {
-	public struct TemperatureEndpointResponseData
+	public struct TemperatureResponse
 	{
 		public long[] Times;
 		public int[] Temps;

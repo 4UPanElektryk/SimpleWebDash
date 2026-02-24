@@ -7,9 +7,9 @@ using System.Text;
 
 namespace SimpleWebDash.Endpoints
 {
-	public class IpDataEndpoint : DataEndpoint
+	public class IpE : DataEndpoint
 	{
-		public IpDataEndpoint(string url) : base(url) { }
+		public IpE(string url) : base(url) { }
 		public override HttpResponse ReturnData(HttpRequest request)
 		{
 			int slowNetResponseTime = 50;
@@ -20,7 +20,7 @@ namespace SimpleWebDash.Endpoints
 			int minutes = int.Parse(tspan.Split('d')[1].Split('h')[1].TrimEnd('m'));
 			TimeSpan span = new TimeSpan(days, hours, minutes, 0);
 			DateTime start = DateTime.UtcNow - span;
-			IpEndpointResponseData responseData = IpMonitorDataManager.GetResponseData(start, Program.monitorConfigs.ToList().Find((e) => e.ID == request.URLParamenters["id"]).Data[0]); // parsing the stupid shitt because im lazy
+			IpResponse responseData = IpMonitorDataManager.GetResponseDataRange(start, DateTime.UtcNow, Program.monitorConfigs.ToList().Find((e) => e.ID == request.URLParamenters["id"]).Data[0]); // parsing the stupid shitt because im lazy
 			string message = "OK";
 			DataResponseType responseType = DataResponseType.Success;
 			if (responseData.Avg > slowNetResponseTime)
@@ -41,7 +41,7 @@ namespace SimpleWebDash.Endpoints
 					}
 				}
 			}
-			ServerDataResponse<IpEndpointResponseData> response1 = new ServerDataResponse<IpEndpointResponseData>()
+			ServerDataResponse<IpResponse> response1 = new ServerDataResponse<IpResponse>()
 			{
 				Type = responseType,
 				Message = message,

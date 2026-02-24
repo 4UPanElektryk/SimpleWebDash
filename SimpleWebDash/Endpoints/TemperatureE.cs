@@ -8,9 +8,9 @@ using System.Text;
 
 namespace SimpleWebDash.Endpoints
 {
-	public class TemperatureDataEndpoint : DataEndpoint
+	public class TemperatureE : DataEndpoint
 	{
-		public TemperatureDataEndpoint(string url) : base(url) { }
+		public TemperatureE(string url) : base(url) { }
 		public override HttpResponse ReturnData(HttpRequest request)
 		{
 			string tspan = request.URLParamenters["t"]; // "0000d00h00m";
@@ -29,11 +29,11 @@ namespace SimpleWebDash.Endpoints
 			}
 			string message = "OK";
 			DataResponseType responseType = DataResponseType.Success;
-			ServerDataResponse<TemperatureEndpointResponseData> response1 = new ServerDataResponse<TemperatureEndpointResponseData>()
+			ServerDataResponse<TemperatureResponse> response1 = new ServerDataResponse<TemperatureResponse>()
 			{
 				Type = responseType,
 				Message = message,
-				Data = new TemperatureEndpointResponseData()
+				Data = new TemperatureResponse()
 				{
 					Times = values.ToArray(),
 					Temps = temps.ToArray(),

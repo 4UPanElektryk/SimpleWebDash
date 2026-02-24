@@ -17,10 +17,10 @@ namespace SimpleWebDash.Monitors.Data
 			allinagiventimespan.AddRange(Temp);
 			return allinagiventimespan.ToArray();
 		}
-		public static IpEndpointResponseData GetResponseData(DateTime date, string ID)
+		public static IpResponse GetResponseData(DateTime date, string ID)
 		{
 			HttpMonitorData[] data = GetAllFrom(date, ID);
-			IpEndpointResponseData response = new IpEndpointResponseData
+			IpResponse response = new IpResponse
 			{
 				Total = data.Length,
 				Timeouts = 0,

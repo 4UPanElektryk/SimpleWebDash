@@ -6,20 +6,20 @@ namespace SimpleWebDash.Monitors.Data
 {
 	public class IpMonitorDataManager : SaveObjManager<IpMonitorData>
 	{
-		public static IpMonitorData[] GetAllFrom(DateTime date, string IP)
+		public static IpMonitorData[] GetAllFromRange(DateTime From, DateTime To, string IP)
 		{
 			//Console.WriteLine(data.Count);
 			List<IpMonitorData> allforip = Saved.FindAll((x) => x.IP == IP);
 			allforip.AddRange(Temp.FindAll((x) => x.IP == IP));
 			//Console.WriteLine(allforip.Count);
-			List<IpMonitorData> allinagiventimespan = allforip.FindAll((x) => x.Time > date);
+			List<IpMonitorData> allinagiventimespan = allforip.FindAll((x) => x.Time > From && x.Time < To);
 			//Console.WriteLine(allinagiventimespan.Count);
 			return allinagiventimespan.ToArray();
 		}
-		public static IpEndpointResponseData GetResponseData(DateTime date, string IP)
+		public static IpResponse GetResponseDataRange(DateTime From, DateTime To, string IP)
 		{
-			IpMonitorData[] data = GetAllFrom(date, IP);
-			IpEndpointResponseData response = new IpEndpointResponseData
+			IpMonitorData[] data = GetAllFromRange(From, To, IP);
+			IpResponse response = new IpResponse
 			{
 				Total = data.Length,
 				Timeouts = 0,

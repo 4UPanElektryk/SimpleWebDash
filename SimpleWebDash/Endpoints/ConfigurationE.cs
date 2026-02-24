@@ -5,9 +5,9 @@ using System.Text;
 
 namespace SimpleWebDash.Endpoints
 {
-	internal class ConfigurationEndpoint : DataEndpoint
+	internal class ConfigurationE : DataEndpoint
 	{
-		public ConfigurationEndpoint(string url) : base(url) { }
+		public ConfigurationE(string url) : base(url) { }
 		public override HttpResponse ReturnData(HttpRequest request)
 		{
 			string message = "OK";
@@ -23,11 +23,11 @@ namespace SimpleWebDash.Endpoints
 					Type = currentConfig[i].Type
 				};
 			}
-			ServerDataResponse<ConfigurationEndpointResponseData> response1 = new ServerDataResponse<ConfigurationEndpointResponseData>()
+			ServerDataResponse<ConfigurationResponse> response1 = new ServerDataResponse<ConfigurationResponse>()
 			{
 				Type = responseType,
 				Message = message,
-				Data = new ConfigurationEndpointResponseData()
+				Data = new ConfigurationResponse()
 				{
 					Configuration = safeConfigs
 				}

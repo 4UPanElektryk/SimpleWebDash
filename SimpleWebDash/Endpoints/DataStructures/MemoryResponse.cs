@@ -1,6 +1,6 @@
 ﻿namespace SimpleWebDash.Endpoints
 {
-	public struct MemoryEndpointResponseData
+	public struct MemoryResponse
 	{
 		public long[] Times;
 		public ulong[] total_kb;
