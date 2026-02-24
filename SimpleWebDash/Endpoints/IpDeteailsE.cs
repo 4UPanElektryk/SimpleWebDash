@@ -1,6 +1,5 @@
 ﻿using NetBase.Communication;
 using Newtonsoft.Json;
-using SimpleWebDash.Endpoints.DataStructures;
 using SimpleWebDash.Monitors.Data;
 using System;
 using System.Linq;

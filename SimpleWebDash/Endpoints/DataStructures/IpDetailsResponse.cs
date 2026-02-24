@@ -1,4 +1,4 @@
-﻿namespace SimpleWebDash.Endpoints.DataStructures
+﻿namespace SimpleWebDash.Endpoints
 {
 	public struct IpDetailsResponse
 	{

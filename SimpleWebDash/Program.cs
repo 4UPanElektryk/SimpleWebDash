@@ -123,8 +123,10 @@ namespace SimpleWebDash
 			};
 			IFileLoader loader = new LocalFileLoader("Docs\\");
 			router.Add(loader, "app.js");
+			router.Add(loader, "details.js");
 			router.Add(loader, "index.html", "");
 			router.Add(loader, "index.html");
+			router.Add(loader, "DetailView.html");
 			router.Add(loader, "style.css");
 			log.Write("Loading Data");
 			ManagerInit(IPPath, HTTPPath, TEMPSPath, MemoryPath);
