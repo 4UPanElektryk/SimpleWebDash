@@ -239,19 +239,19 @@ function CheckTemperatureEndpointAndSet(id: string) {
 		}
 	});*/
 }
-async function GetTempsOfAllServers(): Promise<ServerDataResponse<CombinedTemperatureEndpointResponseData>> {
+async function GetTempsOfAllServers(): Promise<ServerDataResponse<CombinedTemperatureResponse>> {
 	try {
 		const response = await fetch(`/api/fulltempstats?t=${timespan.value}`, { signal: AbortSignal.timeout(5000) });
-		const times = await response.json() as ServerDataResponse<CombinedTemperatureEndpointResponseData>;
+		const times = await response.json() as ServerDataResponse<CombinedTemperatureResponse>;
 		return times;
 	}
 	catch {
-		return new Promise<ServerDataResponse<CombinedTemperatureEndpointResponseData>>((resolve, reject) => {
+		return new Promise<ServerDataResponse<CombinedTemperatureResponse>>((resolve, reject) => {
 			resolve({
 				Type: DataResponseType.Error,
 				Message: "No Response From Server",
 				Data: null
-			} as ServerDataResponse<CombinedTemperatureEndpointResponseData>)
+			} as ServerDataResponse<CombinedTemperatureResponse>)
 		});
 	}
 }
@@ -308,7 +308,7 @@ function drawChart() {
 function CreateHttpChecker(id: string) {
 	return function (sender: SimpleSensor) {
 		fetch(`/api/httpstatus?id=${id}&t=${timespan.value}`).then((x) => x.json()).then((x) => {
-			let res = x as ServerDataResponse<IpEndpointResponseData>;
+			let res = x as ServerDataResponse<IpResponse>;
 			if (res.Type == DataResponseType.Success) {
 				sender.SetDisplay(res.Type, `Min: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\n`);
 			}
@@ -326,7 +326,7 @@ function CreateHttpChecker(id: string) {
 function CreateIpChecker(ip: string) {
 	return function (sender: SimpleSensor) {
 		fetch(`/api/ipstatus?id=${ip}&t=${timespan.value}`).then((x) => x.json()).then((x) => {
-			let res = x as ServerDataResponse<IpEndpointResponseData>;
+			let res = x as ServerDataResponse<IpResponse>;
 			if (res.Type == DataResponseType.Success) {
 				sender.SetDisplay(res.Type, `Min: ${res.Data.Min} ms\nMax: ${res.Data.Max} ms\nAvg: ${res.Data.Avg} ms\n`);
 			}
@@ -344,7 +344,7 @@ function CreateIpChecker(ip: string) {
 
 function FetchConfiguration(setupFinished: Function) {
 	fetch(`/api/configuration`).then((x) => x.json()).then((x) => {
-		let res = x as ServerDataResponse<ConfigurationEndpointResponseData>;
+		let res = x as ServerDataResponse<ConfigurationResponse>;
 		res.Data.Configuration.forEach((element) => {
 			console.log(`Setting up sensor: ${element.FriendlyName} of type ${MonitorType[element.Type]} with ID: ${element.ID}`);
 			if (element.Type == MonitorType.HTTP) {

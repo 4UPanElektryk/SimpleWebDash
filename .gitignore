@@ -9,7 +9,7 @@
 *.user
 *.userosscache
 *.sln.docstates
-app.js
+*.js
 *.css
 *.map
 *.tsbuildinfo

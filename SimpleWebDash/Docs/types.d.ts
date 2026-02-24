@@ -8,7 +8,7 @@ interface ServerDataResponse<T> {
 	Data: T
 }
 
-interface IpEndpointResponseData {
+interface IpResponse {
 	Min: number,
 	Max: number,
 	Avg: number,
@@ -16,7 +16,7 @@ interface IpEndpointResponseData {
 	Total: number
 }
 
-interface TemperatureEndpointResponseData {
+interface TemperatureResponse {
 	Times: Array<number>,
 	Temps: Array<number>,
 	Min: number,
@@ -24,12 +24,12 @@ interface TemperatureEndpointResponseData {
     Avg: number
 }
 
-interface CombinedTemperatureEndpointResponseData {
+interface CombinedTemperatureResponse {
 	Nodes: Dictionary<string>,
-	Temperatures: Dictionary<TemperatureEndpointResponseData>
+	Temperatures: Dictionary<TemperatureResponse>
 }
 
-interface MemoryEndpointResponseData {
+interface MemoryResponse {
 	Times: Array<number>;
 	total_kb: Array<number>;
 	used_kb: Array<number>;
@@ -38,8 +38,8 @@ interface MemoryEndpointResponseData {
 	Min: number;
 }
 
-interface CombinedMemoryEndpointResponseData {
-	MemoryData: Dictionary<MemoryEndpointResponseData>
+interface CombinedMemoryResponse {
+	MemoryData: Dictionary<MemoryResponse>
 }
 
 interface MonitorConfig {
@@ -48,6 +48,6 @@ interface MonitorConfig {
 	Type: MonitorType,
 }
 
-interface ConfigurationEndpointResponseData {
+interface ConfigurationResponse {
     Configuration: Array<MonitorConfig>
 }

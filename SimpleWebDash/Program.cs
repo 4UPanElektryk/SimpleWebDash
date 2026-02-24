@@ -45,7 +45,7 @@ namespace SimpleWebDash
 			}
 			else
 			{
-				try
+				//try
 				{
 					if (!File.Exists(args[0]))
 					{
@@ -63,7 +63,7 @@ namespace SimpleWebDash
 					monitorscfg = config["Monitors"].ToObject<MonitorConfig[]>();
 
 				}
-				catch (Exception ex)
+				/*catch (Exception ex)
 				{
 					Console.Error.WriteLine("Error parsing config file");
 					Console.Error.WriteLine("Please make sure the config file is in the correct format");
@@ -85,7 +85,7 @@ namespace SimpleWebDash
 					throw ex;
 #endif
 					Environment.Exit(1);
-				}
+				}*/
 			}
 			List<MonitorConfig> configs = monitorscfg.ToList();
 			monitorscfg = configs.ToArray();
