@@ -9,7 +9,7 @@ namespace SimpleWebDash
 		public DataEndpoint(string url) { EndpointUrl = url; }
 		public virtual HttpResponse ReturnData(HttpRequest request)
 		{
-			return new HttpResponse(StatusCode.Not_Found);
+			return new HttpResponse(StatusCode.Not_Implemented);
 		}
 		protected TimeSpan ParseRequestTimeSpan(HttpRequest request)
 		{

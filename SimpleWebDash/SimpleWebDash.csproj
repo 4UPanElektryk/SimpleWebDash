@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutomaticServiceDiscovery.cs" />
     <Compile Include="Clock.cs" />
     <Compile Include="Endpoints\CombinedMemoryE.cs" />
     <Compile Include="Endpoints\DataStructures\CombinedMemoryResponse.cs" />
