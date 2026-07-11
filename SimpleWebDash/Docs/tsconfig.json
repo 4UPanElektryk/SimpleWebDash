@@ -5,5 +5,10 @@
     "tsBuildInfoFile": null,
     "listEmittedFiles": true,
     "incremental": false
-  }
+  },
+  "include": [
+    "app.ts",
+    "details.ts",
+    "types.d.ts"
+  ]
 }
