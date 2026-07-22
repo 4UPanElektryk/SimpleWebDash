@@ -34,7 +34,7 @@ public class HttpMonitor : Monitor
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"{e.TickTime} {this.GetType().Name}: {_id}\nException occured: {ex.Message}\nStack Trace: {ex.StackTrace}\n");
+			Console.WriteLine($"{e.TickTime} {GetType().Name}: {_id}\nException occured: {ex.Message}\nStack Trace: {ex.StackTrace}\n");
 		}
 		stopwatch.Stop();
 		HttpMonitorDataManager.Add(new HttpMonitorData()

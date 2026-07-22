@@ -6,7 +6,7 @@ public static class AutomaticServiceDiscovery
 	{
 		Basic = 0, // Only search for gas services and internet connection
 		Default = 1, // Also Scan port 80, 433 and 8080
-		Full = 2, // Also Test DHCP and try to use hostnames
+		Full = 2, // Also Test DNS and try to use hostnames
 	}
 	public static void AttemptServiceDiscovery(string startIp, string endIp, ScanType type)
 	{

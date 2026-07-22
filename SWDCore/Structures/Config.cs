@@ -10,7 +10,7 @@ public static class Config
 		Current = new TConfig();
 		try
 		{
-
+			Current = JsonConvert.DeserializeObject<TConfig>(Path);
 		}
 		catch (Exception ex)
 		{
