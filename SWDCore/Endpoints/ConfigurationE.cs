@@ -1,5 +1,6 @@
 ﻿using NetBase.Communication;
 using Newtonsoft.Json;
+using SWDCore.Structures;
 using SWDCore.Structures.Endpoint;
 using System.Text;
 
@@ -12,7 +13,7 @@ internal class ConfigurationE : DataEndpoint
 	{
 		string message = "OK";
 		DataResponseType responseType = DataResponseType.Success;
-		MonitorConfig[] currentConfig = Program.monitorConfigs;
+		MonitorConfig[] currentConfig = Config.Current.Monitors;
 		SafeMonitorConfig[] safeConfigs = new SafeMonitorConfig[currentConfig.Length];
 		for (int i = 0; i < currentConfig.Length; i++)
 		{

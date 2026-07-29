@@ -10,7 +10,8 @@ public struct TConfig
 	public string IPAddress;
 	public int Port;
 	public bool IsReadOnlyMode;
-	public int TestInterval;
-	public int SaveInterval;
+	public int TestIntervalS;
+	public int SaveIntervalS;
+	public int SlowNetworkResponseMs;
 	public MonitorConfig[] Monitors;
 }

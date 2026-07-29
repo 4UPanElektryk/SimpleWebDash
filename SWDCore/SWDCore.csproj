@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\libs\NetBase\NetBase.WebAPI\NetBase.WebAPI.csproj" />
     <ProjectReference Include="..\libs\NetBase\NetBase\NetBase.csproj" />
   </ItemGroup>
 
