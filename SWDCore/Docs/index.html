@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style.css">
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<title>Service Status</title>
+</head>
+<body>
+    <select name="" id="period">
+        <option value="0000d00h10m">10 minute</option>
+        <option value="0000d00h30m">30 minute</option>
+        <option value="0000d01h00m">1 hour</option>
+        <option value="0000d06h00m">6 hours</option>
+        <option value="0000d12h00m">12 hours</option>
+        <option value="0001d00h00m">1 day</option>
+        <option value="0007d00h00m">1 Week</option>
+        <option value="0014d00h00m">2 Weeks</option>
+        <option value="0028d00h00m">1 Month</option>
+        <option value="0091d00h00m">3 Months</option>
+        <option value="0182d00h00m">6 Months</option>
+        <option value="0365d00h00m">1 Year</option>
+    </select>
+	<div class="sensors-set" id="sensors-container">
+		<div class="sensor-graph" id="Temperature">
+			<span class="big"><i class="fa" aria-hidden="true" id="Temperature-icon"></i>Server Temperature</span>
+			<span class="small" id="Temperature-msg"></span>
+			<div class="chart" id="Temperature-chart"></div>
+		</div>
+		<!--<div class="sensor-graph" id="Memory">
+			<span class="big"><i class="fa" aria-hidden="true" id="Memory-icon"></i>Server Memory</span>
+			<span class="small" id="Memory-msg"></span>
+			<div class="chart" id="Memory-chart"></div>
+		</div>-->
+	</div>
+	<script src="app.js"></script>
+</body>
+</html>

@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using SWDCore.Monitors.DataManagers;
 using SWDCore.Structures.Endpoint;
 using System.Text;
+using SWDCore.Structures;
 
 namespace SWDCore.Endpoints;
 
@@ -11,7 +12,7 @@ class IpDeteailsE : DataEndpoint
 	public IpDeteailsE(string url) : base(url) { }
 	public override HttpResponse ReturnData(HttpRequest request)
 	{
-		string id = Program.monitorConfigs.ToList().Find((e) => e.ID == request.URLParamenters["id"]).Data[0];
+		string id = Config.Current.Monitors.ToList().Find((e) => e.ID == request.URLParamenters["id"]).Data[0];
 		string tspan = request.URLParamenters["t"]; // "0000d00h00m";
 		int days = int.Parse(tspan.Split('d')[0]);
 		int hours = int.Parse(tspan.Split('d')[1].Split('h')[0]);

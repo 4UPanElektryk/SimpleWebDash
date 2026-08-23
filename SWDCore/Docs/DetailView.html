@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Service Status</title>
+</head>
+<body>
+    <select name="" id="period">
+        <option value="0000d00h10m">10 minute</option>
+        <option value="0000d00h30m">30 minute</option>
+        <option value="0000d01h00m">1 hour</option>
+        <option value="0000d06h00m">6 hours</option>
+        <option value="0000d12h00m">12 hours</option>
+        <option value="0001d00h00m">1 day</option>
+        <option value="0007d00h00m">1 Week</option>
+        <option value="0014d00h00m">2 Weeks</option>
+        <option value="0028d00h00m">1 Month</option>
+        <option value="0091d00h00m">3 Months</option>
+        <option value="0182d00h00m">6 Months</option>
+        <option value="0365d00h00m">1 Year</option>
+    </select>
+    <select name="" id="steps">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="40">40</option>
+        <option value="80">80</option>
+        <option value="160">160</option>
+        <option value="320">320</option>
+    </select>
+    <div class="central-graph" id="details-chart">
+
+    </div>
+    <script src="details.js"></script>
+</body>
+</html>

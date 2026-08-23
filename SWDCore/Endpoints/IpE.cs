@@ -1,6 +1,7 @@
 ﻿using NetBase.Communication;
 using Newtonsoft.Json;
 using SWDCore.Monitors.DataManagers;
+using SWDCore.Structures;
 using SWDCore.Structures.Endpoint;
 using System.Text;
 
@@ -13,13 +14,9 @@ public class IpE : DataEndpoint
 	{
 		int slowNetResponseTime = 50;
 
-		string tspan = request.URLParamenters["t"]; // "0000d00h00m";
-		int days = int.Parse(tspan.Split('d')[0]);
-		int hours = int.Parse(tspan.Split('d')[1].Split('h')[0]);
-		int minutes = int.Parse(tspan.Split('d')[1].Split('h')[1].TrimEnd('m'));
-		TimeSpan span = new(days, hours, minutes, 0);
+		TimeSpan span = ParseRequestTimeSpan(request);
 		DateTime start = DateTime.UtcNow - span;
-		IpResponse responseData = IpMonitorDataManager.GetResponseDataRange(start, DateTime.UtcNow, Program.monitorConfigs.ToList().Find((e) => e.ID == request.URLParamenters["id"]).Data[0]); // parsing the stupid shitt because im lazy
+		IpResponse responseData = IpMonitorDataManager.GetResponseDataRange(start, DateTime.UtcNow, Config.Current.Monitors.ToList().Find((e) => e.ID == request.URLParamenters["id"]).Data[0]); // parsing the stupid shitt because im lazy
 		string message = "OK";
 		DataResponseType responseType = DataResponseType.Success;
 		if (responseData.Avg > slowNetResponseTime)

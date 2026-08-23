@@ -10,13 +10,13 @@ public static class Config
 		Current = new TConfig();
 		try
 		{
-			Current = JsonConvert.DeserializeObject<TConfig>(Path);
+			Current = JsonConvert.DeserializeObject<TConfig>(File.ReadAllText(Path));
 		}
 		catch (Exception ex)
 		{
 			Console.Error.WriteLine("Error parsing config file");
 			Console.Error.WriteLine("Please make sure the config file is in the correct format");
-
+			Console.Error.WriteLine("");
 			Console.Error.WriteLine($"Inner Exception: \nMessage: {ex.Message}\nSource: {ex.Source}\nTrace: {ex.StackTrace}");
 			Environment.Exit(1);
 		}
